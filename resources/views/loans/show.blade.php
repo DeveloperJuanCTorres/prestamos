@@ -51,7 +51,7 @@
                                 <td>S/. {{ number_format($p->amount,2) }}</td>
                                 <td>
                                     @if($p->paid)
-                                        <span class="badge bg-success">PAGADO</span>
+                                        <!-- <span class="badge bg-success">PAGADO</span> -->
 
                                         <a href="{{ route('payments.ticket', $p->id) }}" 
                                         class="btn btn-dark btn-sm" 
@@ -84,7 +84,7 @@
 
 @section('script')
 
-<script>
+<!-- <script>
 document.addEventListener("DOMContentLoaded", function() {
     document.querySelectorAll('.btn-pay').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -105,6 +105,56 @@ document.addEventListener("DOMContentLoaded", function() {
                     // Procesar pago
                     window.location.href = "/payments/" + paymentId + "/pay?print=1";
 
+                }
+            });
+        });
+    });
+});
+</script> -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll('.btn-pay').forEach(btn => {
+        btn.addEventListener('click', function() {
+            let paymentId = this.getAttribute('data-id');
+
+            Swal.fire({
+                title: '¿Confirmar pago?',
+                text: "Esta acción marcará la cuota como pagada.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, pagar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                    // Enviar pago al backend vía AJAX
+                    fetch(`/payments/${paymentId}/pay`, {
+                        method: "POST",
+                        headers: {
+                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            "Accept": "application/json"
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+
+                        if (data.success) {
+
+                            // Abrir ticket en nueva pestaña
+                            // window.open(`/payments/${data.payment_id}/ticket`, "_blank");
+
+                            Swal.fire(
+                                'Pagado',
+                                'La cuota ha sido marcada como pagada.',
+                                'success'
+                            ).then(() => {
+                                location.reload(); // Recargar listado
+                            });
+                        }
+
+                    });
                 }
             });
         });

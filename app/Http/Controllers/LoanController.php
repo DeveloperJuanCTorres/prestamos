@@ -183,12 +183,10 @@ class LoanController extends Controller
         $payment->paid = 1;
         $payment->save();
 
-        // Si viene de SweetAlert para imprimir automáticamente
-        if (request()->has('print')) {
-            return redirect()->route('payments.ticket', $payment->id);
-        }
-
-        return back()->with('success', 'Pago registrado.');
+        return response()->json([
+            'success' => true,
+            'payment_id' => $payment->id
+        ]);
     }
 
     public function printSchedule($id)

@@ -42,7 +42,7 @@ Route::get('/loans/create', [LoanController::class, 'create'])->name('loans.crea
 Route::post('/loans', [LoanController::class, 'store'])->name('loans.store');
 Route::get('/loans/{loan}', [LoanController::class, 'show'])->name('loans.show');
 
-Route::get('payments/{id}/pay', [LoanController::class, 'pay'])->name('payments.pay');
+Route::post('payments/{id}/pay', [LoanController::class, 'pay'])->name('payments.pay');
 Route::get('loans/{id}/print-schedule', [LoanController::class, 'printSchedule'])->name('loans.printSchedule');
 Route::get('payments/{id}/ticket', [LoanController::class, 'ticket'])->name('payments.ticket');
 
