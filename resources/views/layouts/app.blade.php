@@ -15,26 +15,29 @@
 
    
     <!-- loader-->
-    <link href="assets/css/pace.min.css" rel="stylesheet"/>
-    <script src="assets/js/pace.min.js"></script>
+    <link href="{{asset ('assets/css/pace.min.css')}}" rel="stylesheet"/>
+    <script src="{{asset ('assets/js/pace.min.js')}}"></script>
     <!--favicon-->
-    <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="{{asset ('assets/images/favicon.ico')}}" type="image/x-icon">
     <!--Full Calendar Css-->
-    <link href="assets/plugins/fullcalendar/css/fullcalendar.min.css" rel='stylesheet'/>
+    <link href="{{asset ('assets/plugins/fullcalendar/css/fullcalendar.min.css')}}" rel='stylesheet'/>
     <!-- Vector CSS -->
     <!-- <link href="assets/plugins/vectormap/jquery-jvectormap-2.0.2.css" rel="stylesheet"/> -->
     <!-- simplebar CSS-->
-    <link href="assets/plugins/simplebar/css/simplebar.css" rel="stylesheet"/>
+    <link href="{{asset ('assets/plugins/simplebar/css/simplebar.css')}}" rel="stylesheet"/>
     <!-- Bootstrap core CSS-->
-    <link href="assets/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="{{asset ('assets/css/bootstrap.min.css')}}" rel="stylesheet"/>
+    
     <!-- animate CSS-->
-    <link href="assets/css/animate.css" rel="stylesheet" type="text/css"/>
+    <link href="{{asset ('assets/css/animate.css')}}" rel="stylesheet" type="text/css"/>
     <!-- Icons CSS-->
-    <link href="assets/css/icons.css" rel="stylesheet" type="text/css"/>
+    <link href="{{asset ('assets/css/icons.css')}}" rel="stylesheet" type="text/css"/>
     <!-- Sidebar CSS-->
-    <link href="assets/css/sidebar-menu.css" rel="stylesheet"/>
+    <link href="{{asset ('assets/css/sidebar-menu.css')}}" rel="stylesheet"/>
     <!-- Custom Style-->
-    <link href="assets/css/app-style.css" rel="stylesheet"/>
+    <link href="{{asset ('assets/css/app-style.css')}}" rel="stylesheet"/>
+
+    <link href="{{asset ('assets/css/styles.css')}}" rel="stylesheet"/>
 
     <!-- Scripts -->
     <!-- vite(['resources/sass/app.scss', 'resources/js/app.js']) -->
@@ -47,30 +50,33 @@
     </div>
 
     <!-- Bootstrap core JavaScript-->
-    <script src="assets/js/jquery.min.js"></script>
-    <script src="assets/js/popper.min.js"></script>
-    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="{{asset ('assets/js/jquery.min.js')}}"></script>
+    <script src="{{asset ('assets/js/popper.min.js')}}"></script>
+    <script src="{{asset ('assets/js/bootstrap.min.js')}}"></script>
         
     <!-- simplebar js -->
-    <script src="assets/plugins/simplebar/js/simplebar.js"></script>
+    <script src="{{asset ('assets/plugins/simplebar/js/simplebar.js')}}"></script>
     <!-- sidebar-menu js -->
-    <script src="assets/js/sidebar-menu.js"></script>
+    <script src="{{asset ('assets/js/sidebar-menu.js')}}"></script>
     <!-- loader scripts -->
-    <script src="assets/js/jquery.loading-indicator.js"></script>
+    <!-- <script src="assets/js/jquery.loading-indicator.js"></script> -->
     <!-- Custom scripts -->
-    <script src="assets/js/app-script.js"></script>
+    <script src="{{asset ('assets/js/app-script.js')}}"></script>
     <!-- Chart js -->
     
-    <script src="assets/plugins/Chart.js/Chart.min.js"></script>
+    <script src="{{asset ('assets/plugins/Chart.js/Chart.min.js')}}"></script>
     
     <!-- Index js -->
-    <script src="assets/js/index.js"></script>
+    <!-- <script src="assets/js/index.js"></script> -->
 
     <!-- Full Calendar -->
      <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- <script src='assets/plugins/fullcalendar/js/moment.min.js'></script>
     <script src='assets/plugins/fullcalendar/js/fullcalendar.min.js'></script>
     <script src="assets/plugins/fullcalendar/js/fullcalendar-custom-script.js"></script> -->
+
+    @yield('script')
 </body>
 </html>

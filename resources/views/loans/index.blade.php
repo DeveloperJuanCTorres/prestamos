@@ -16,8 +16,8 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h5 class="card-title m-0">Listado de Tipos de pagos</h5>
-                                <a href="#" class="btn btn-success" id="btnCreate"><i class="fa fa-plus px-2"></i>Nuevo</a>
+                                <h5 class="card-title m-0">Listado de Préstamos</h5>
+                                <a href="/loans/create" class="btn btn-success"><i class="fa fa-plus px-2"></i>Nuevo</a>
                             </div>
 
                             <div class="d-flex mb-3">
@@ -35,23 +35,24 @@
                                     <thead>
                                         <tr>
                                             <th style="width: 10%;">ID</th>
-                                            <th style="width: 20%;">Tipo.</th>
-                                            <th style="width: 15%;">% MIN</th>
-                                            <th style="width: 15%;">% MAX</th>
-                                            <th style="width: 15%;">Periodo</th>
-                                            <th style="width: 15%;"># Pagos</th>
+                                            <th style="width: 20%;">Cliente.</th>
+                                            <th style="width: 15%;">Teléfono</th>
+                                            <th style="width: 15%;">Monto</th>
+                                            <th style="width: 15%;">%</th>
+                                            <th style="width: 15%;"># Cuotas</th>
+                                            <th style="width: 15%;">T. a pagar</th>
                                             <th style="width: 10%;">Accion</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @include('types.partials.list')
+                                        @include('loans.partials.list')
                                     </tbody>
                                 </table>
                             </div>
 
                             <!-- Contenedor de paginación -->
                             <div id="pagination-container">
-                                {{ $types->links() }}
+                                {{ $loans->links() }}
                             </div>
 
                         </div>
@@ -65,8 +66,6 @@
 
     @include('partials.footer')
     @include('partials.config')
-    @include('types.create')
-    @include('types.edit')
 
 </div>
 
@@ -82,7 +81,7 @@
         let perPage = $("#perPage").val();
 
         $.ajax({
-            url: "{{ route('types.list') }}",
+            url: "{{ route('loans.list') }}",
             type: "GET",
             data: { search: search, perPage: perPage, page: page },
             dataType: "json",

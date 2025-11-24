@@ -305,4 +305,10 @@
     
     </div>
     <!--End wrapper-->
+
+<!-- Index js -->
+    @section('script')
+        <script src="assets/js/index.js"></script>
+
+    @endsection
 @endsection

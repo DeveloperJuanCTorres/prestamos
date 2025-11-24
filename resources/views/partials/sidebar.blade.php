@@ -2,7 +2,7 @@
 <div id="sidebar-wrapper" data-simplebar="" data-simplebar-auto-hide="true">
     <div class="brand-logo">
         <a href="index.html">
-            <img src="assets/images/logo-icon.png" class="logo-icon" alt="logo icon">
+            <img src="{{asset ('assets/images/logo-icon.png')}}" class="logo-icon" alt="logo icon">
             <h5 class="logo-text">Préstamos</h5>
         </a>
     </div>
