@@ -64,7 +64,7 @@ class TypeController extends Controller
                 'name' => 'required|string|max:255',
                 'minimo' => 'required',
                 'maximo' => 'required',
-                'periodicity_days' => 'required',
+                'periodo' => 'required',
                 'num_payments' => 'required'
             ]);
 
