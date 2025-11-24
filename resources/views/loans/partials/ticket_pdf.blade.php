@@ -21,7 +21,7 @@
 
         .wrapper {
             width: 100%;
-            padding: 40px 5px;
+            padding: 50px 0 0 0;
             box-sizing: border-box;
         }
 
