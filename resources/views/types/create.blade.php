@@ -32,7 +32,7 @@
                         <div class="col-lg-6 col-md-6 col-12">
                             <div class="form-group">
                                 <label for="periodo" class="form-label">Periodo</label>
-                                <input type="text" class="form-control" id="periodo" name="periodo" placeholder="Ingrese periodo en días" maxlength="2"
+                                <input type="text" class="form-control" id="periodicity_days" name="periodicity_days" placeholder="Ingrese periodo en días" maxlength="2"
                                     oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9);">
                             </div>
                         </div>   
