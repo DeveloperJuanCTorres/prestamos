@@ -20,7 +20,7 @@
                         <div class="row row-group m-0">
                             <div class="col-12 col-lg-6 col-xl-3 border-light">
                                 <div class="card-body">
-                                    <h5 class="text-white mb-0">150 <span class="float-right"><i class="fa fa-shopping-cart"></i></span></h5>
+                                    <h5 class="text-white mb-0">{{$total_prestamos}} <span class="float-right"><i class="fa fa-shopping-cart"></i></span></h5>
                                     <div class="progress my-3" style="height:3px;">
                                         <div class="progress-bar" style="width:55%"></div>
                                     </div>
@@ -29,7 +29,7 @@
                             </div>
                             <div class="col-12 col-lg-6 col-xl-3 border-light">
                                 <div class="card-body">
-                                    <h5 class="text-white mb-0">8500.00 <span class="float-right"><i class="fa fa-usd"></i></span></h5>
+                                    <h5 class="text-white mb-0">{{$total_prestado}} <span class="float-right"><i>S/.</i></span></h5>
                                     <div class="progress my-3" style="height:3px;">
                                         <div class="progress-bar" style="width:55%"></div>
                                     </div>
@@ -38,7 +38,7 @@
                             </div>
                             <div class="col-12 col-lg-6 col-xl-3 border-light">
                                 <div class="card-body">
-                                    <h5 class="text-white mb-0">4300 <span class="float-right"><i class="fa fa-usd"></i></span></h5>
+                                    <h5 class="text-white mb-0">{{$total_devuelto}} <span class="float-right"><i>S/.</i></span></h5>
                                     <div class="progress my-3" style="height:3px;">
                                         <div class="progress-bar" style="width:55%"></div>
                                     </div>
@@ -47,7 +47,7 @@
                             </div>
                             <div class="col-12 col-lg-6 col-xl-3 border-light">
                                 <div class="card-body">
-                                    <h5 class="text-white mb-0">85 <span class="float-right"><i class="zmdi zmdi-accounts-outline"></i></span></h5>
+                                    <h5 class="text-white mb-0">{{$clients}} <span class="float-right"><i class="zmdi zmdi-accounts-outline"></i></span></h5>
                                     <div class="progress my-3" style="height:3px;">
                                         <div class="progress-bar" style="width:55%"></div>
                                     </div>
@@ -78,16 +78,16 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <ul class="list-inline">
+                                <!-- <ul class="list-inline">
                                     <li class="list-inline-item"><i class="fa fa-circle mr-2 text-white"></i>Crédito</li>
                                     <li class="list-inline-item"><i class="fa fa-circle mr-2 text-light"></i>Débito</li>
-                                </ul>
+                                </ul> -->
                                 <div class="chart-container-1">
-                                    <canvas id="chart1"></canvas>
+                                    <canvas id="chart-1"></canvas>
                                 </div>
                             </div>
                 
-                            <div class="row m-0 row-group text-center border-top border-light-3">
+                            <!-- <div class="row m-0 row-group text-center border-top border-light-3">
                                 <div class="col-12 col-lg-4">
                                     <div class="p-3">
                                         <h5 class="mb-0">S/. 45,300.00</h5>
@@ -106,7 +106,7 @@
                                     <small class="mb-0">Toal réstamos <span> <i class="fa fa-arrow-up"></i> 5.62%</span></small>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                 
                         </div>
                     </div>
@@ -131,32 +131,25 @@
                             </div>
                             <div class="card-body">
                                 <div class="chart-container-2">
-                                <canvas id="chart2"></canvas>
+                                <canvas id="chart-2"></canvas>
                                 </div>
                             </div>
                             <div class="table-responsive">
                                 <table class="table align-items-center">
                                     <tbody>
-                                        <tr>
-                                        <td><i class="fa fa-circle text-white mr-2"></i> Diario</td>
-                                        <td>S/. 5,856</td>
-                                        <td>+55%</td>
-                                        </tr>
-                                        <tr>
-                                        <td><i class="fa fa-circle text-light-1 mr-2"></i>Semanal</td>
-                                        <td>S/. 2,602</td>
-                                        <td>+25%</td>
-                                        </tr>
-                                        <tr>
-                                        <td><i class="fa fa-circle text-light-2 mr-2"></i>Mensual</td>
-                                        <td>S/. 1,802</td>
-                                        <td>+15%</td>
-                                        </tr>
-                                        <tr>
-                                        <td><i class="fa fa-circle text-light-3 mr-2"></i>Otros</td>
-                                        <td>S/. 1,105</td>
-                                        <td>+5%</td>
-                                        </tr>
+                                        @foreach($tipos as $tipo)
+                                            <tr>
+                                                <td>
+                                                    <i class="fa fa-circle text-white mr-2"></i> 
+                                                    {{ $tipo->name }}
+                                                </td>
+
+                                                {{-- Cantidad de préstamos de ese tipo --}}
+                                                <td>
+                                                    S/. {{ $prestamosPorTipo[$tipo->id] ?? 0 }}
+                                                </td>
+                                            </tr>
+                                        @endforeach
                                     </tbody>
                                 </table>
                             </div>
@@ -193,88 +186,27 @@
                                             <th>Monto</th>
                                             <th>Por Cobrar</th>
                                             <th>Fecha</th>
-                                            <th>Shipping</th>
+                                            <th>Acción</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>Pedro Lopez</td>
-                                            <td>#265</td>
-                                            <td>S/. 200.00</td>
-                                            <td>S/.  10.00</td>
-                                            <td>20/11/2025</td>
-                                            <td>
-                                                <div class="progress shadow" style="height: 3px;">
-                                                    <div class="progress-bar" role="progressbar" style="width: 90%"></div>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                        @foreach ($prestamosVencidos as $prestamo)
+                                            @foreach ($prestamo->payments as $cuota)
+                                                <tr>
+                                                    <td>{{ $prestamo->client->name }}</td>
+                                                    <td>#{{ $prestamo->id }}</td>
+                                                    <td>S/. {{ number_format($prestamo->amount, 2) }}</td>
+                                                    <td>S/. {{ number_format($cuota->amount, 2) }}</td>
+                                                    <td>{{ \Carbon\Carbon::parse($cuota->due_date)->format('d/m/Y') }}</td>
 
-                                        <tr>
-                                            <td>Enrique Sarmiento</td>
-                                            <td>#271</td>
-                                            <td>S/. 200.00</td>
-                                            <td>S/.  10.00</td>
-                                            <td>20/11/2025</td>
-                                            <td>
-                                                <div class="progress shadow" style="height: 3px;">
-                                                    <div class="progress-bar" role="progressbar" style="width: 90%"></div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        
-                                        <tr>
-                                            <td>Jahir Sifuentes</td>
-                                            <td>#268</td>
-                                            <td>S/. 200.00</td>
-                                            <td>S/.  10.00</td>
-                                            <td>20/11/2025</td>
-                                            <td>
-                                                <div class="progress shadow" style="height: 3px;">
-                                                    <div class="progress-bar" role="progressbar" style="width: 90%"></div>
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>Yampier Geronimo</td>
-                                            <td>#267</td>
-                                            <td>S/. 200.00</td>
-                                            <td>S/.  10.00</td>
-                                            <td>20/11/2025</td>
-                                            <td>
-                                                <div class="progress shadow" style="height: 3px;">
-                                                    <div class="progress-bar" role="progressbar" style="width: 90%"></div>
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>Angel Tenorio</td>
-                                            <td>#266</td>
-                                            <td>S/. 200.00</td>
-                                            <td>S/.  10.00</td>
-                                            <td>20/11/2025</td>
-                                            <td>
-                                                <div class="progress shadow" style="height: 3px;">
-                                                    <div class="progress-bar" role="progressbar" style="width: 90%"></div>
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>Ana Gabriel</td>
-                                            <td>#270</td>
-                                            <td>S/. 200.00</td>
-                                            <td>S/.  10.00</td>
-                                            <td>20/11/2025</td>
-                                            <td>
-                                                <div class="progress shadow" style="height: 3px;">
-                                                    <div class="progress-bar" role="progressbar" style="width: 90%"></div>
-                                                </div>
-                                            </td>
-                                        </tr>
-
+                                                    <td>
+                                                        <a href="{{ route('loans.show', $prestamo->id) }}" class="btn btn-primary btn-sm">
+                                                            Ver
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        @endforeach
                                     </tbody>
                                 </table>
                             </div>
@@ -309,6 +241,116 @@
 <!-- Index js -->
     @section('script')
         <script src="assets/js/index.js"></script>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+
+                var ctx = document.getElementById("chart-2").getContext('2d');
+
+                var myChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: {!! json_encode($tipos->pluck('name')) !!},  // nombres dinámicos
+                        datasets: [{
+                            data: {!! json_encode($prestamosPorTipo->values()) !!}, // datos dinámicos
+                            backgroundColor: [
+                                "#ffffff",
+                                "rgba(255, 255, 255, 0.70)",
+                                "rgba(255, 255, 255, 0.50)",
+                                "rgba(255, 255, 255, 0.20)",
+                                "#dddddd", // puedes agregar más colores si hay más tipos
+                            ],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false, // permite que el contenedor defina el tamaño
+                        cutoutPercentage: 40,       // grosor del anillo (menos = más grueso)
+                        legend: {
+                            display: true,          // mostrar leyenda
+                            position: "bottom",
+                            labels: {
+                                fontColor: "#ffffff", // texto de leyenda en blanco
+                                boxWidth: 15
+                            }
+                        },
+                        tooltips: {
+                            displayColors: false,
+                            titleFontColor: "#ffffff",
+                            bodyFontColor: "#ffffff",
+                            backgroundColor: "rgba(0,0,0,0.7)",
+                            xPadding: 10,
+                            yPadding: 10,
+                            cornerRadius: 6,
+                            callbacks: {
+                                label: function(tooltipItem, data) {
+                                    var dataset = data.datasets[tooltipItem.datasetIndex];
+                                    var value = dataset.data[tooltipItem.index];
+                                    var label = data.labels[tooltipItem.index];
+                                    return label + ": S/ " + value;
+                                }
+                            }
+                        }
+                    }
+                });
+
+
+                // chart1
+
+                var ctx = document.getElementById('chart-1').getContext('2d');
+
+                var myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"],
+                        datasets: [
+                            {
+                                label: 'Monto total de préstamos',
+                                data: {!! json_encode($montosPrestamos) !!},
+                                backgroundColor: "rgba(255, 255, 255, 0.25)",
+                                borderColor: "#ffffff",
+                                pointRadius: 3,
+                                borderWidth: 3,
+                                fill: true
+                            },
+                            {
+                                label: 'Pagos realizados',
+                                data: {!! json_encode($montosPagos) !!},
+                                backgroundColor: "rgba(255, 255, 255, 0.1)",
+                                borderColor: "rgba(255, 255, 255, 0.7)",
+                                pointRadius: 3,
+                                borderWidth: 3,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        legend: {
+                            display: true,
+                            labels: { fontColor: '#ffffff' }
+                        },
+                        tooltips: {
+                            displayColors: false,
+                            titleFontColor: '#ffffff',
+                            bodyFontColor: '#ffffff',
+                            backgroundColor: "rgba(0,0,0,0.7)"
+                        },
+                        scales: {
+                            xAxes: [{
+                                ticks: { fontColor: '#ddd' },
+                                gridLines: { color: "rgba(221, 221, 221, 0.08)" }
+                            }],
+                            yAxes: [{
+                                ticks: { beginAtZero: true, fontColor: '#ddd' },
+                                gridLines: { color: "rgba(221, 221, 221, 0.08)" }
+                            }]
+                        }
+                    }
+                });
+
+            });
+        </script>
 
     @endsection
 @endsection
