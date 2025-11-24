@@ -85,7 +85,7 @@
 
         <tr>
             <td><strong>Cuota:</strong></td>
-            <td>{{ $payment->id }}</td>
+            <td>{{ $payment->cuota }}</td>
         </tr>
 
         <tr>

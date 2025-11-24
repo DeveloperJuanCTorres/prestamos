@@ -151,6 +151,7 @@ class LoanController extends Controller
                     'amount' => $amt,
                     'created_at' => now(),
                     'updated_at' => now(),
+                    'cuota' => $i
                 ];
 
                 $currentDate = $currentDate->copy()->addDays($periodDays);

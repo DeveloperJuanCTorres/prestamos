@@ -46,7 +46,7 @@
                     <tbody>
                         @foreach($loan->payments as $i => $p)
                             <tr>
-                                <td>{{ $i + 1 }}</td>
+                                <td>{{ $p->cuota }}</td>
                                 <td>{{ $p->due_date }}</td>
                                 <td>S/. {{ number_format($p->amount,2) }}</td>
                                 <td>

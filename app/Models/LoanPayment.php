@@ -10,7 +10,7 @@ class LoanPayment extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['loan_id','due_date','amount','paid'];
+    protected $fillable = ['loan_id','due_date','amount','paid','cuota'];
 
     public function loan()
     {
