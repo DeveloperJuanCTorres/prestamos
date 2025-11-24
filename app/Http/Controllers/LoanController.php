@@ -204,7 +204,7 @@ class LoanController extends Controller
         $payment = LoanPayment::with('loan.client')->findOrFail($id);
 
         $pdf = Pdf::loadView('loans.partials.ticket_pdf', compact('payment'))
-                ->setPaper([0, 0, 203, 300]); // Formato ticket 80mm
+                ->setPaper([0, 0, 203, 350]); // Formato ticket 80mm
 
         return $pdf->stream('ticket_pago_'.$payment->id.'.pdf');
     }
