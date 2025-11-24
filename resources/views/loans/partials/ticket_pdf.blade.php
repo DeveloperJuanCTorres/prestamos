@@ -12,7 +12,7 @@
         }
 
         body {
-            font-family: sans-serif;
+            font-family: 'Courier New', Courier, monospace;
             font-size: 14px;
             text-align: center;
             margin: 0;
@@ -101,7 +101,7 @@
 
     <div class="line"></div>
 
-    <p>Gracias por su pago</p>
+    <p style="font-size: 16px;">Gracias por su pago</p>
     <p>{{ date('d/m/Y H:i') }}</p>
 
 </div>
