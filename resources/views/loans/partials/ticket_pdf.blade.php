@@ -16,12 +16,12 @@
             font-size: 14px;
             text-align: center;
             margin: 0;
-            padding: 0;
+            padding: 10px;
         }
 
         .wrapper {
             width: 100%;
-            padding: 2px 5px;
+            padding: 20px 5px;
             box-sizing: border-box;
         }
 
@@ -45,7 +45,7 @@
 
         td {
             font-size: 14px;
-            padding: 1px 0;
+            padding: 1px;
             text-align: left;
         }
 
