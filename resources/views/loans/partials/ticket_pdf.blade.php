@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Courier New', Courier, monospace;
-            font-size: 14px;
+            font-size: 16px;
             text-align: center;
             margin: 0;
             padding: 10px;
@@ -26,7 +26,7 @@
         }
 
         .title {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: bold;
             margin: 0;
             padding: 0;
@@ -44,7 +44,7 @@
         }
 
         td {
-            font-size: 14px;
+            font-size: 16px;
             padding: 1px;
             text-align: left;
         }
@@ -95,14 +95,14 @@
 
         <tr>
             <td><strong>Fecha pago:</strong></td>
-            <td>{{ \Carbon\Carbon::parse($payment->paid_at)->format('d/m/Y H:i') }}</td>
+            <td>{{ \Carbon\Carbon::parse($payment->paid_at)->format('d/m/Y') }}</td>
         </tr>
     </table>
 
     <div class="line"></div>
 
     <p style="font-size: 16px;">Gracias por su pago</p>
-    <p>{{ date('d/m/Y H:i') }}</p>
+    <p>{{ date('d/m/Y') }}</p>
 
 </div>
 
