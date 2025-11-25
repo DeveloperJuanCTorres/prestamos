@@ -18,7 +18,7 @@
                             <i class="fa fa-eye me-2"></i> Detalle
                         </a>
                     </li>
-                    <li>
+                    <!-- <li>
                         <a class="dropdown-item loan-edit" href="javascript:void(0);"
                             data-id="{{ $loan->id }}">
                             <i class="fa fa-pencil-square me-2"></i> Editar
@@ -30,7 +30,7 @@
                             data-name="{{ $loan->name }}">
                             <i class="fa fa-trash me-2"></i> Eliminar
                         </a>
-                    </li>
+                    </li> -->
                 </ul>
             </div>
         </td>
