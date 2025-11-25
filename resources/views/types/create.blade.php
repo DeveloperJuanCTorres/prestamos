@@ -4,7 +4,7 @@
         <div class="modal-content bg-theme bg-theme-modal">
             <div class="modal-header">
                 <h5 class="modal-title" id="staticBackdropLabel">Nuevo tipo de pago</h5>
-                <button type="button" class="btn btn-close" data-dismiss="modal" aria-label="Close">x</button>
+                <button type="button" class="btn btn-danger btn-close" data-dismiss="modal" aria-label="Close">x</button>
             </div>
             <div class="modal-body">
                 <form id="formAgregar">

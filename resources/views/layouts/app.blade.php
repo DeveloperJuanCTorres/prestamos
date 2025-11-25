@@ -46,8 +46,11 @@
     <div id="app">
         <main>
             @yield('content')
+            
         </main>
     </div>
+    
+
 
     <!-- Bootstrap core JavaScript-->
     <script src="{{asset ('assets/js/jquery.min.js')}}"></script>

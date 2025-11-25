@@ -2,7 +2,7 @@
 
 @section('content')
     <!-- Start wrapper-->
-    <div id="wrapper">
+    <div id="wrapper" style="min-height: 100vh;">
     
         @include('partials.sidebar')
 
@@ -63,7 +63,7 @@
                         <div class="card">
                             <div class="card-header">Préstamos Anual
                                 <div class="card-action">
-                                    <div class="dropdown">
+                                    <!-- <div class="dropdown">
                                         <a href="javascript:void();" class="dropdown-toggle dropdown-toggle-nocaret" data-toggle="dropdown">
                                             <i class="icon-options"></i>
                                         </a>
@@ -74,7 +74,7 @@
                                             <div class="dropdown-divider"></div>
                                             <a class="dropdown-item" href="javascript:void();">Separated link</a>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                             <div class="card-body">
@@ -115,7 +115,7 @@
                         <div class="card">
                             <div class="card-header">Tipos de Pagos
                                 <div class="card-action">
-                                    <div class="dropdown">
+                                    <!-- <div class="dropdown">
                                         <a href="javascript:void();" class="dropdown-toggle dropdown-toggle-nocaret" data-toggle="dropdown">
                                             <i class="icon-options"></i>
                                         </a>
@@ -126,7 +126,7 @@
                                             <div class="dropdown-divider"></div>
                                             <a class="dropdown-item" href="javascript:void();">Separated link</a>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                             <div class="card-body">
@@ -231,12 +231,13 @@
         <a href="javaScript:void();" class="back-to-top"><i class="fa fa-angle-double-up"></i> </a>
         <!--End Back To Top Button-->
         
-        @include('partials.footer')
+        
         
         @include('partials.config')
-    
+        @include('partials.footer')
     </div>
     <!--End wrapper-->
+    
 
 <!-- Index js -->
     @section('script')

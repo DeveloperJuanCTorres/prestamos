@@ -2,7 +2,7 @@
 
 @section('content')
 
-<div id="wrapper">
+<div id="wrapper" style="min-height: 100vh;">
 
     @include('partials.sidebar')
     @include('partials.topbar')
@@ -63,11 +63,11 @@
 
     <a href="javaScript:void();" class="back-to-top"><i class="fa fa-angle-double-up"></i></a>
 
-    @include('partials.footer')
+    
     @include('partials.config')
     @include('clients.create')
     @include('clients.edit')
-
+    @include('partials.footer')
 </div>
 
 <!-- JS -->
@@ -123,6 +123,42 @@
     $(document).on("click", ".registrar", function(e){
         e.preventDefault();
         let formData = new FormData($("#formAgregar")[0]);
+        if ($('#numero_doc').val() == '') {
+            $('#numero_doc').focus();
+            Swal.fire({
+                title: "Campo requerido",
+                text: "El campo Numero documento es requerido",
+                icon: "info"
+            });       
+            return false;     
+        }
+        if ($('#name').val() == '') {
+            $('#name').focus();
+            Swal.fire({
+                title: "Campo requerido",
+                text: "El campo Nombre del cliente es requerido",
+                icon: "info"
+            });    
+            return false;          
+        }
+        if ($('#address').val() == '') {
+            $('#address').focus();
+            Swal.fire({
+                title: "Campo requerido",
+                text: "El campo Dirección es requerido",
+                icon: "info"
+            });     
+            return false;         
+        }
+        if ($('#phone').val() == '') {
+            $('#phone').focus();
+            Swal.fire({
+                title: "Campo requerido",
+                text: "El campo Teléfono es requerido",
+                icon: "info"
+            });  
+            return false;            
+        }
 
         $.ajax({
             url: "{{ route('clients.store') }}",
@@ -150,7 +186,7 @@
     // ===============================
     $(document).on("click", ".client-edit", function(e){
         e.preventDefault();
-        let id = $(this).data("id");
+        let id = $(this).data("id");        
 
         $.ajax({
             url: "{{ route('clients.edit') }}",
@@ -178,6 +214,43 @@
     $(document).on("submit", "#formEditClient", function(e){
         e.preventDefault();
         let formData = new FormData(this);
+
+        if ($('#edit_numero_doc').val() == '') {
+            $('#edit_numero_doc').focus();
+            Swal.fire({
+                title: "Campo requerido",
+                text: "El campo Numero documento es requerido",
+                icon: "info"
+            });       
+            return false;     
+        }
+        if ($('#edit_name').val() == '') {
+            $('#edit_name').focus();
+            Swal.fire({
+                title: "Campo requerido",
+                text: "El campo Nombre del cliente es requerido",
+                icon: "info"
+            });    
+            return false;          
+        }
+        if ($('#edit_address').val() == '') {
+            $('#edit_address').focus();
+            Swal.fire({
+                title: "Campo requerido",
+                text: "El campo Dirección es requerido",
+                icon: "info"
+            });     
+            return false;         
+        }
+        if ($('#edit_phone').val() == '') {
+            $('#edit_phone').focus();
+            Swal.fire({
+                title: "Campo requerido",
+                text: "El campo Teléfono es requerido",
+                icon: "info"
+            });  
+            return false;            
+        }
 
         $.ajax({
             url: "{{ route('clients.update') }}",

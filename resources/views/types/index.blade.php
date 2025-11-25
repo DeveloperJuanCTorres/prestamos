@@ -2,7 +2,7 @@
 
 @section('content')
 
-<div id="wrapper">
+<div id="wrapper" style="min-height: 100vh;">
 
     @include('partials.sidebar')
     @include('partials.topbar')
@@ -124,6 +124,52 @@
         e.preventDefault();
         let formData = new FormData($("#formAgregar")[0]);
 
+        if ($('#name').val() == '') {
+            $('#name').focus();
+            Swal.fire({
+                title: "Campo requerido",
+                text: "El campo Tipo es requerido",
+                icon: "info"
+            });       
+            return false;     
+        }
+        if ($('#minimo').val() == '') {
+            $('#minimo').focus();
+            Swal.fire({
+                title: "Campo requerido",
+                text: "El campo % Mínimo es requerido",
+                icon: "info"
+            });    
+            return false;          
+        }
+        if ($('#maximo').val() == '') {
+            $('#maximo').focus();
+            Swal.fire({
+                title: "Campo requerido",
+                text: "El campo % Máximo es requerido",
+                icon: "info"
+            });     
+            return false;         
+        }
+        if ($('#periodicity_days').val() == '') {
+            $('#periodicity_days').focus();
+            Swal.fire({
+                title: "Campo requerido",
+                text: "El campo Periodo es requerido",
+                icon: "info"
+            });  
+            return false;            
+        }
+        if ($('#num_payments').val() == '') {
+            $('#num_payments').focus();
+            Swal.fire({
+                title: "Campo requerido",
+                text: "El campo # Pagos es requerido",
+                icon: "info"
+            });  
+            return false;            
+        }
+
         $.ajax({
             url: "{{ route('types.store') }}",
             type: "POST",
@@ -177,6 +223,52 @@
     $(document).on("submit", "#formEditType", function(e){
         e.preventDefault();
         let formData = new FormData(this);
+
+        if ($('#edit_name').val() == '') {
+            $('#edit_name').focus();
+            Swal.fire({
+                title: "Campo requerido",
+                text: "El campo Tipo es requerido",
+                icon: "info"
+            });       
+            return false;     
+        }
+        if ($('#edit_minimo').val() == '') {
+            $('#edit_minimo').focus();
+            Swal.fire({
+                title: "Campo requerido",
+                text: "El campo % Mínimo es requerido",
+                icon: "info"
+            });    
+            return false;          
+        }
+        if ($('#edit_maximo').val() == '') {
+            $('#edit_maximo').focus();
+            Swal.fire({
+                title: "Campo requerido",
+                text: "El campo Máximo es requerido",
+                icon: "info"
+            });     
+            return false;         
+        }
+        if ($('#edit_periodicity_days').val() == '') {
+            $('#edit_periodicity_days').focus();
+            Swal.fire({
+                title: "Campo requerido",
+                text: "El campo Periodo es requerido",
+                icon: "info"
+            });  
+            return false;            
+        }
+        if ($('#edit_num_payments').val() == '') {
+            $('#edit_num_payments').focus();
+            Swal.fire({
+                title: "Campo requerido",
+                text: "El campo # Pagos es requerido",
+                icon: "info"
+            });  
+            return false;            
+        }
 
         $.ajax({
             url: "{{ route('types.update') }}",

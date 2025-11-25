@@ -1,12 +1,12 @@
 @foreach($loans as $loan)
     <tr>
         <td>{{$loan->id}}</td>
-        <td>{{$loan->client->name}}</td>
-        <td>{{$loan->client->phone}}</td>
-        <td>{{$loan->amount}}</td>
+        <td>{{$loan->client?->name ?? 'Cliente eliminado'}}</td>
+        <td>{{$loan->client?->phone ?? '---------'}}</td>
+        <td>S/. {{$loan->amount}}</td>
         <td>{{$loan->interest_percent}}%</td>
         <td>{{$loan->num_payments}}</td>
-        <td>{{$loan->total_to_pay}}</td>
+        <td>S/. {{$loan->total_to_pay}}</td>
         <td class="text-center">
             <div class="dropdown">
                 <button class="btn btn-primary btn-sm" type="button" id="dropdownMenuButton{{ $loan->id }}" data-toggle="dropdown" aria-expanded="false">

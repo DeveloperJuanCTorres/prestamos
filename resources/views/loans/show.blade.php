@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div id="wrapper">
+<div id="wrapper" style="min-height: 100vh;">
 
     @include('partials.sidebar')
     @include('partials.topbar')
@@ -14,8 +14,8 @@
 
             <div class="card mb-3">
                 <div class="card-body">
-                    <p><strong>Cliente:</strong> {{ $loan->client->name }} ({{ $loan->client->numero_doc }})</p>
-                    <p><strong>Tipo:</strong> {{ $loan->type->name }}</p>
+                    <p><strong>Cliente:</strong> {{ $loan->client?->name ?? 'Cliente eliminado'}} ({{ $loan->client?->numero_doc ?? '---------' }})</p>
+                    <p><strong>Tipo:</strong> {{ $loan->type?->name ?? 'Tipo eliminado' }}</p>
                     <p><strong>Monto:</strong> S/. {{ number_format($loan->amount,2) }}</p>
                     <p><strong>% Interés:</strong> {{ number_format($loan->interest_percent,2) }}%</p>
                     <p><strong>Interés total:</strong> S/. {{ number_format($loan->total_to_pay - $loan->amount,2) }}</p>
@@ -37,7 +37,7 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <th># Cuota</th>
                             <th>Fecha vencimiento</th>
                             <th>Monto</th>
                             <th>Pagado</th>

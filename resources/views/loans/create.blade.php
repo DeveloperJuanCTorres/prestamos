@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div id="wrapper">
+<div id="wrapper" style="min-height: 100vh;">
 
     @include('partials.sidebar')
     @include('partials.topbar')
@@ -40,7 +40,8 @@
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label for="amount" class="form-label">Monto (S/.)</label>
-                        <input type="number" step="0.01" min="0.01" name="amount" id="amount" class="form-control" value="{{ old('amount') }}" required>
+                        <input type="text" name="amount" id="amount" class="form-control" value="{{ old('amount') }}" required maxlength="4"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9);">
                     </div>
 
                     <div class="col-md-4 mb-3">
@@ -57,7 +58,8 @@
 
                     <div class="col-md-4 mb-3">
                         <label for="interest_percent" class="form-label">% Interés</label>
-                        <input type="number" step="0.01" name="interest_percent" id="interest_percent" class="form-control" value="{{ old('interest_percent') }}" required>
+                        <input type="text" name="interest_percent" id="interest_percent" class="form-control" value="{{ old('interest_percent') }}" required required maxlength="2"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9);">
                         <small id="interestHelp" class="form-text text-white">El rango permitido aparecerá al seleccionar el tipo.</small>
                     </div>
                 </div>

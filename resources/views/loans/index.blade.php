@@ -2,7 +2,7 @@
 
 @section('content')
 
-<div id="wrapper">
+<div id="wrapper" style="min-height: 100vh;">
 
     @include('partials.sidebar')
     @include('partials.topbar')
@@ -38,10 +38,10 @@
                                             <th style="width: 20%;">Cliente.</th>
                                             <th style="width: 15%;">Teléfono</th>
                                             <th style="width: 15%;">Monto</th>
-                                            <th style="width: 15%;">%</th>
+                                            <th style="width: 10%;">%</th>
                                             <th style="width: 15%;"># Cuotas</th>
                                             <th style="width: 15%;">T. a pagar</th>
-                                            <th style="width: 10%;">Accion</th>
+                                            <th style="width: 15%;">Accion</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -64,8 +64,9 @@
 
     <a href="javaScript:void();" class="back-to-top"><i class="fa fa-angle-double-up"></i></a>
 
-    @include('partials.footer')
+    
     @include('partials.config')
+    @include('partials.footer')
 
 </div>
 
@@ -122,6 +123,7 @@
     $(document).on("click", ".registrar", function(e){
         e.preventDefault();
         let formData = new FormData($("#formAgregar")[0]);
+        
 
         $.ajax({
             url: "{{ route('types.store') }}",

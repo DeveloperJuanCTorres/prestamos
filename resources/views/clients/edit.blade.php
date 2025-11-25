@@ -4,7 +4,7 @@
         <div class="modal-content bg-theme bg-theme-modal">
             <div class="modal-header">
                 <h5 class="modal-title" id="staticBackdropLabel">Editar Cliente</h5>
-                <button type="button" class="btn btn-close" data-dismiss="modal" aria-label="Close">x</button>
+                <button type="button" class="btn btn-danger btn-close" data-dismiss="modal" aria-label="Close">x</button>
             </div>
             <div class="modal-body">
                 <form id="formEditClient" method="POST" enctype="multipart/form-data">
@@ -37,7 +37,7 @@
                         <div class="col-lg-12 col-md-12 col-12">
                             <div class="form-group">
                                 <label for="tipo_doc">Nombre</label>
-                                <input class="form-control" type="text" id="edit_name" name="name" placeholder="Ingrese cliente">
+                                <input class="form-control" required type="text" id="edit_name" name="name" placeholder="Ingrese cliente">
                             </div>
                         </div>
                         <div class="col-lg-12 col-md-12 col-12">
