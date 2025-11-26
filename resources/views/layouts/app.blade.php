@@ -42,7 +42,7 @@
     <!-- Scripts -->
     <!-- vite(['resources/sass/app.scss', 'resources/js/app.js']) -->
 </head>
-<body class="bg-theme bg-theme1">
+<body class="bg-theme bg-theme9">
     <div id="app">
         <main>
             @yield('content')
