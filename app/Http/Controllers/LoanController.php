@@ -106,12 +106,11 @@ class LoanController extends Controller
                 ->withErrors(['interest_percent' => "El % de interés debe estar entre {$min}% y {$max}% para el tipo {$type->name}."]);
         }
 
-        // Iniciar transacción
         DB::beginTransaction();
         try {
             $amount = round((float)$request->amount, 2);
 
-            // Cálculo de interés simple (puedes adaptar a interés compuesto si lo deseas)
+            // Cálculo de interés simple
             $interestAmount = round($amount * ($interestPercent / 100), 2);
             $totalToPay = round($amount + $interestAmount, 2);
 
@@ -129,35 +128,35 @@ class LoanController extends Controller
                 'num_payments' => $numPayments,
             ]);
 
-            // Generar cronograma: cuotas iguales y ajustar última cuota por redondeo
-            $basePayment = floor( ($totalToPay / $numPayments) * 100 ) / 100; // truncar a 2 decimales (down)
-            $payments = [];
-            $currentDate = Carbon::now()->addDay($periodDays); // empieza desde el siguiente periodo
+            // Calcular cuota base redondeada al décimo superior
+            $basePayment = ceil(($totalToPay * 100 / $numPayments) / 10) / 10;
 
-            // Crear todas menos la última
-            $accumulated = 0.00;
+            $payments = [];
+            $currentDate = Carbon::now()->addDays($periodDays);
+            $accumulated = 0;
+
             for ($i = 1; $i <= $numPayments; $i++) {
                 if ($i < $numPayments) {
                     $amt = $basePayment;
                     $accumulated += $amt;
                 } else {
-                    // última cuota = total - acumulado (ajuste)
+                    // Última cuota ajusta exacto el total
                     $amt = round($totalToPay - $accumulated, 2);
                 }
 
                 $payments[] = [
-                    'loan_id' => $loan->id,
-                    'due_date' => $currentDate->toDateString(),
-                    'amount' => $amt,
+                    'loan_id'    => $loan->id,
+                    'due_date'   => $currentDate->toDateString(),
+                    'amount'     => $amt,
                     'created_at' => now(),
                     'updated_at' => now(),
-                    'cuota' => $i
+                    'cuota'      => $i
                 ];
 
                 $currentDate = $currentDate->copy()->addDays($periodDays);
             }
 
-            // Insertar en bloque
+            // Insertar todas las cuotas
             LoanPayment::insert($payments);
 
             DB::commit();
@@ -170,6 +169,8 @@ class LoanController extends Controller
             return back()->withInput()->withErrors(['error' => 'Error al crear préstamo: ' . $e->getMessage()]);
         }
     }
+
+    
 
     // Mostrar préstamo y cronograma
     public function show(Loan $loan)
