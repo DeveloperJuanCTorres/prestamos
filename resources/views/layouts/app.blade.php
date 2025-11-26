@@ -38,7 +38,7 @@
     <link href="{{asset ('assets/css/app-style.css')}}" rel="stylesheet"/>
 
     <link href="{{asset ('assets/css/styles.css')}}" rel="stylesheet"/>
-    <link rel="stylesheet" href="{{ asset('assets/css/select2.min.css') }}">
+ 
     
 
     <!-- Scripts -->
@@ -79,7 +79,7 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script src="{{ asset('assets/js/select2.min.js') }}"></script>
+
 
 
     <!-- <script src='assets/plugins/fullcalendar/js/moment.min.js'></script>

@@ -114,7 +114,7 @@
     </div>
     <!--wrapper-->
     
-    @section('script')
+    @push('script')
     <script>
         function togglePassword() {
             const input = document.getElementById("password");
@@ -131,6 +131,6 @@
             }
         }
     </script>
-    @endsection
+    @endpush
 
 @endsection

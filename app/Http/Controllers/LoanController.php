@@ -168,9 +168,7 @@ class LoanController extends Controller
             DB::rollBack();
             return back()->withInput()->withErrors(['error' => 'Error al crear préstamo: ' . $e->getMessage()]);
         }
-    }
-
-    
+    }    
 
     // Mostrar préstamo y cronograma
     public function show(Loan $loan)

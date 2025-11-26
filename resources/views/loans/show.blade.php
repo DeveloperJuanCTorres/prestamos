@@ -82,7 +82,7 @@
 
 </div>
 
-@section('script')
+@push('script')
 
 <!-- <script>
 document.addEventListener("DOMContentLoaded", function() {
@@ -161,5 +161,5 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 </script>
-@endsection
+@endpush
 @endsection

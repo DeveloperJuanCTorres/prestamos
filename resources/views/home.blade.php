@@ -240,7 +240,7 @@
     
 
 <!-- Index js -->
-    @section('script')
+    @push('script')
         <script src="assets/js/index.js"></script>
 
         <script>
@@ -353,5 +353,5 @@
             });
         </script>
 
-    @endsection
+    @endpush
 @endsection
