@@ -49,7 +49,8 @@ class TypeController extends Controller
 
         if ($request->ajax()) {
             return response()->json([
-                'table' => view('types.partials.list', compact('types'))->render(),
+                'table' => view('types.partials.list_table', compact('types'))->render(),
+                'cards' => view('types.partials.list_cards', compact('types'))->render(),
                 'pagination' => $types->links()->render()
             ]);
         }

@@ -30,7 +30,7 @@
                                 </select>
                             </div>
 
-                            <div class="table-responsive" id="types-container">
+                            <div class="table-responsive d-none d-md-block" id="types-container">
                                 <table class="table table-striped table-bordered w-100" style="width: 100% !important;">
                                     <thead>
                                         <tr>
@@ -45,14 +45,21 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @include('loans.partials.list')
+                                        @include('loans.partials.list_table')
                                     </tbody>
                                 </table>
                             </div>
 
+                            <!-- CARDS MÓVIL -->
+                            <div class="d-block d-md-none" id="loans-cards-container">
+                                @include('loans.partials.list_cards')
+                            </div>
+
                             <!-- Contenedor de paginación -->
-                            <div id="pagination-container">
-                                {{ $loans->links() }}
+                            <div class="d-flex justify-content-center mt-2">
+                                <div class="pagination-sm">
+                                    {{ $loans->links('pagination::bootstrap-4') }}
+                                </div>
                             </div>
 
                         </div>
@@ -89,6 +96,7 @@
             success: function(data) {
                 // Actualizar tabla y paginación
                 $("#types-container tbody").html(data.table);
+                $("#loans-cards-container").html(data.cards);
                 $("#pagination-container").html(data.pagination);
             }
         });

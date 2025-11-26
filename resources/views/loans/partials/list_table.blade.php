@@ -5,7 +5,11 @@
         <td>{{$loan->client?->phone ?? '---------'}}</td>
         <td>S/. {{$loan->amount}}</td>
         <td>{{$loan->interest_percent}}%</td>
-        <td>{{$loan->num_payments}}</td>
+        <td>
+            <span class="badge badge-warning my-auto">
+                {{ $loan->num_payments }} cuotas
+            </span>
+        </td>
         <td>S/. {{$loan->total_to_pay}}</td>
         <td class="text-center">
             <div class="dropdown">

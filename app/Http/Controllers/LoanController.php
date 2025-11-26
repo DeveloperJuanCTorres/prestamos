@@ -48,14 +48,18 @@ class LoanController extends Controller
         $perPage = $request->input('perPage', 10);
 
         $loans = Loan::query()
-            ->when($search, function($query, $search) {
-                $query->where('id', 'like', "%{$search}%");
+            ->when($search, function ($query, $search) {
+                $query->whereHas('client', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                })
+                ->orWhere('id', 'like', "%{$search}%"); // opcional: seguir buscando por ID también
             })
             ->paginate($perPage);
 
         if ($request->ajax()) {
             return response()->json([
-                'table' => view('loans.partials.list', compact('loans'))->render(),
+                'table' => view('loans.partials.list_table', compact('loans'))->render(),
+                'cards' => view('loans.partials.list_cards', compact('loans'))->render(),
                 'pagination' => $loans->links()->render()
             ]);
         }

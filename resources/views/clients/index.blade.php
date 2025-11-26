@@ -30,7 +30,7 @@
                                 </select>
                             </div>
 
-                            <div class="table-responsive" id="clients-container">
+                            <div class="table-responsive d-none d-md-block" id="clients-container">
                                 <table class="table table-striped table-bordered w-100">
                                     <thead>
                                         <tr>
@@ -44,14 +44,21 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @include('clients.partials.list')
+                                        @include('clients.partials.list_table')
                                     </tbody>
                                 </table>
                             </div>
 
+                            <!-- Cards para móvil -->
+                            <div class="d-block d-md-none" id="clients-cards-container">
+                                @include('clients.partials.list_cards')
+                            </div>
+
                             <!-- Contenedor de paginación -->
-                            <div id="pagination-container">
-                                {{ $clients->links() }}
+                             <div class="d-flex justify-content-center mt-2">
+                                <div class="pagination-sm">
+                                    {{ $clients->links('pagination::bootstrap-4') }}
+                                </div>
                             </div>
 
                         </div>
@@ -89,6 +96,7 @@
             success: function(data) {
                 // Actualizar tabla y paginación
                 $("#clients-container tbody").html(data.table);
+                $("#clients-cards-container").html(data.cards);
                 $("#pagination-container").html(data.pagination);
             }
         });

@@ -53,7 +53,8 @@ class ClientController extends Controller
 
         if ($request->ajax()) {
             return response()->json([
-                'table' => view('clients.partials.list', compact('clients'))->render(),
+                'table' => view('clients.partials.list_table', compact('clients'))->render(),
+                'cards' => view('clients.partials.list_cards', compact('clients'))->render(),
                 'pagination' => $clients->links()->render()
             ]);
         }
