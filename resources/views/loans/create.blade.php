@@ -3,15 +3,58 @@
 @section('content')
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
-        .select2-container--default .select2-selection--single .select2-selection__rendered {
+        /* .select2-container--default .select2-selection--single .select2-selection__rendered {
             background: linear-gradient(45deg, #29323c, #485563);
             line-height: 28px;
-        }
+        } */
         .select2-container--open .select2-dropdown {
             background: linear-gradient(45deg, #29323c, #485563);
         }
         .select2-container--default .select2-selection--single .select2-selection__rendered {
             color: #fff !important;
+            background-color: linear-gradient(45deg, #29323c, #485563);
+        }
+
+        /* CONTENEDOR PRINCIPAL */
+        .select2-container .select2-selection--single {
+            height: calc(1.5em + .75rem + 2px);
+            border: 1px solid #ced4da;
+            border-radius: .375rem; /* .25rem si usas BS4 */
+            padding: .375rem .75rem;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(45deg, #29323c, #485563);
+        }
+
+        /* TEXTO SELECCIONADO */
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            padding-left: 0;
+            color: #495057;
+            line-height: normal;
+        }
+
+        /* FLECHITA */
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 100%;
+            right: 6px;
+        }
+
+        /* FOCO (FOCUS) COMO INPUT */
+        .select2-container--default.select2-container--focus 
+        .select2-selection--single {
+            border-color: #86b7fe;
+            background: linear-gradient(45deg, #29323c, #485563);
+            box-shadow: 0 0 0 .2rem rgba(13,110,253,.25);
+        }
+
+        /* ERROR DE VALIDACIÓN */
+        .is-invalid + .select2-container .select2-selection {
+            border-color: #dc3545;
+        }
+
+        /* RESPONSIVE */
+        .select2-container {
+            width: 100% !important;
         }
     </style>
 
