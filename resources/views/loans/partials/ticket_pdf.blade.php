@@ -77,6 +77,14 @@
 
     <div class="line"></div>
 
+    @php
+        $totalCuotas = $payment->loan->type->num_payments;
+        $totalPagado = $payment->loan->payments()
+                        ->where('paid', 1)
+                        ->sum('amount');
+        $saldoPendiente = $payment->loan->total_to_pay - $totalPagado;
+    @endphp
+
     <table>
         <tr>
             <td><strong>Préstamo:</strong></td>
@@ -85,12 +93,17 @@
 
         <tr>
             <td><strong>Cuota:</strong></td>
-            <td>{{ $payment->cuota }}</td>
+            <td>{{ $payment->cuota }}/{{ $totalCuotas }}</td>
         </tr>
 
         <tr>
             <td><strong>Monto:</strong></td>
             <td>S/ {{ number_format($payment->amount, 2) }}</td>
+        </tr>
+
+        <tr>
+            <td><strong>Saldo:</strong></td>
+            <td>S/ {{ number_format($saldoPendiente, 2) }}</td>
         </tr>
 
         <tr>

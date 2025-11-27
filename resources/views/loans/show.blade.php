@@ -15,6 +15,7 @@
             <div class="card mb-3">
                 <div class="card-body">
                     <p><strong>Cliente:</strong> {{ $loan->client?->name ?? 'Cliente eliminado'}} ({{ $loan->client?->numero_doc ?? '---------' }})</p>
+                    <p><strong>Fecha:</strong> {{$loan->created_at->format('d/m/Y') }}</p>
                     <p><strong>Tipo:</strong> {{ $loan->type?->name ?? 'Tipo eliminado' }}</p>
                     <p><strong>Monto:</strong> S/. {{ number_format($loan->amount,2) }}</p>
                     <p><strong>% Interés:</strong> {{ number_format($loan->interest_percent,2) }}%</p>
