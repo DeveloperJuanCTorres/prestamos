@@ -38,6 +38,8 @@
     <link href="{{asset ('assets/css/app-style.css')}}" rel="stylesheet"/>
 
     <link href="{{asset ('assets/css/styles.css')}}" rel="stylesheet"/>
+
+
  
     
 
@@ -78,68 +80,44 @@
      <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        $(document).ready(function () {
 
-            const wrapper  = document.getElementById('select2-custom');
-            const dropdown = document.getElementById('select2-dropdown');
-            const search   = document.getElementById('select2-search');
-            const results  = document.getElementById('select2-results');
-            const hidden   = document.getElementById('client_id');
-            const text     = document.getElementById('select2-text');
-
-            let timer = null;
-
-            // ✅ ABRIR SELECT
-            wrapper.addEventListener('click', function () {
-                dropdown.style.display = 'block';
-                search.focus();
-                fetchClients('');
-            });
-
-            // ✅ BUSCAR
-            search.addEventListener('keyup', function () {
-                clearTimeout(timer);
-                let q = this.value.trim();
-
-                timer = setTimeout(() => {
-                    fetchClients(q);
-                }, 300);
-            });
-
-            // ✅ AJAX
-            function fetchClients(q) {
-                fetch(`/clients/search?q=${q}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        results.innerHTML = '';
-
-                        if (!data.length) {
-                            results.innerHTML = `<div class="select2-item disabled">Sin resultados</div>`;
-                            return;
-                        }
-
-                        data.forEach(client => {
-                            let div = document.createElement('div');
-                            div.className = 'select2-item';
-                            div.textContent = `${client.name} — ${client.numero_doc}`;
-
-                            div.onclick = () => {
-                                hidden.value = client.id;
-                                text.textContent = div.textContent;
-                                dropdown.style.display = 'none';
-                            };
-
-                            results.appendChild(div);
-                        });
-                    });
-            }
-
-            // ✅ CERRAR AL HACER CLICK AFUERA
-            document.addEventListener('click', function (e) {
-                if (!wrapper.contains(e.target) && !dropdown.contains(e.target)) {
-                    dropdown.style.display = 'none';
+            $('#client_id').select2({
+                width: '100%',
+                placeholder: '-- Seleccionar cliente --',
+                minimumInputLength: 0,
+                language: {
+                    inputTooShort: function () {
+                        return "Buscar por nombre o DNI...";
+                    },
+                    searching: function () {
+                        return "Buscando...";
+                    },
+                    noResults: function () {
+                        return "No se encontraron resultados";
+                    }
+                },
+                ajax: {
+                    url: '/clients/search',
+                    dataType: 'json',
+                    delay: 300,
+                    data: function (params) {
+                        return {
+                            q: params.term
+                        };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data.map(item => ({
+                                id: item.id,
+                                text: item.name + ' — ' + item.numero_doc
+                            }))
+                        };
+                    },
+                    cache: true
                 }
             });
 

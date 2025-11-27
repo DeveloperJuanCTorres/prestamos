@@ -1,31 +1,19 @@
 @extends('layouts.app')
 
 @section('content')
-<style>
-    #select2-custom {
-        cursor: pointer;
-        /* background: white; */
-        min-height: 38px;
-    }
-
-    #select2-dropdown .select2-item {
-        color: #333;
-        padding: 8px 12px;
-        cursor: pointer;
-        
-    }
-
-    #select2-dropdown .select2-item:hover {
-        background: linear-gradient(45deg, #29323c, #485563);
-        color: white;
-    }
-
-    #select2-dropdown .disabled {
-        color: black;
-        pointer-events: none;
-        color: white;
-    }
-</style>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            background: linear-gradient(45deg, #29323c, #485563);
+            line-height: 28px;
+        }
+        .select2-container--open .select2-dropdown {
+            background: linear-gradient(45deg, #29323c, #485563);
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #fff !important;
+        }
+    </style>
 
     <div id="wrapper" style="min-height: 100vh;">
 
@@ -51,23 +39,10 @@
                 <form action="{{ route('loans.store') }}" method="POST" id="loanForm">
                     @csrf
 
-                    <div class="mb-3 position-relative">
-                        <label class="form-label">Cliente</label>
+                    <div class="mb-3">
+                        <label for="client_id" class="form-label">Cliente</label>
 
-                        <div id="select2-custom" class="form-control d-flex align-items-center" tabindex="0">
-                            <span id="select2-text">-- Seleccionar cliente --</span>
-                            <input type="hidden" name="client_id" id="client_id">
-                            <span class="ms-auto">▾</span>
-                        </div>
-
-                        <div id="select2-dropdown" class="border rounded shadow bg-white"
-                            style="display:none; position:absolute; width:100%; z-index:9999;">
-
-                            <input type="text" id="select2-search" class="form-control border-0 border-bottom" style="background-color: black;"
-                                placeholder="Buscar cliente por nombre o DNI..." autocomplete="off">
-
-                            <div id="select2-results" style="max-height:260px; overflow-y:auto;"></div>
-                        </div>
+                        <select name="client_id" id="client_id" class="form-control text-white w-100" required></select>
                     </div>
 
                     <div class="row">
