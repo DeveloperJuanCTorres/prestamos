@@ -27,6 +27,15 @@ Route::post('/clients/store', [ClientController::class, 'store'])->name('clients
 Route::post('/clients/edit', [ClientController::class, 'edit'])->name('clients.edit');
 Route::post('/clients/update', [ClientController::class, 'update'])->name('clients.update');
 Route::post('/clients/delet', [ClientController::class, 'destroy'])->name('clients.delet');
+Route::get('/clients/search', function (Illuminate\Http\Request $request) {
+    $q = $request->q;
+
+    return \App\Models\Client::where('name', 'like', "%$q%")
+        ->orWhere('numero_doc', 'like', "%$q%")
+        ->orderBy('name')
+        ->limit(30)
+        ->get(['id', 'name', 'numero_doc']);
+});
 
 Route::get('/types', [TypeController::class, 'index']);
 Route::get('/types/list', [TypeController::class, 'list'])->name('types.list');
