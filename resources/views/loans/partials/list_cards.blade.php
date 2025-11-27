@@ -4,7 +4,7 @@
 
         <div class="d-flex justify-content-between">
             <strong>Préstamo #{{ $loan->id }}</strong>
-            <span class="badge badge-warning my-auto">
+            <span class="badge badge-info my-auto">
                 {{ $loan->num_payments }} cuotas
             </span>
         </div>
@@ -15,6 +15,13 @@
             <div><strong>Monto:</strong> S/. {{ number_format($loan->amount, 2) }}</div>
             <div><strong>Interés:</strong> {{ $loan->interest_percent }} %</div>
             <div><strong>Total:</strong> S/. {{ number_format($loan->total_to_pay, 2) }}</div>
+            <div><strong>Estado:</strong> 
+                @if ($loan->estado == 'pagado')
+                    <span class="badge badge-success">PAGADO</span>
+                @else
+                    <span class="badge badge-danger">PENDIENTE</span>
+                @endif
+            </div>
         </div>
 
         <div class="mt-2 d-flex justify-content-end">

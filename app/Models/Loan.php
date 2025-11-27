@@ -33,4 +33,9 @@ class Loan extends Model
     {
         return $this->hasMany(LoanPayment::class, 'loan_id');
     }
+
+    public function getEstadoAttribute()
+    {
+        return $this->payments()->where('paid', 0)->count() === 0 ? 'pagado' : 'pendiente';
+    }
 }

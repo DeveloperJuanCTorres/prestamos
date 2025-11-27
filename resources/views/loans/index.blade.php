@@ -34,14 +34,15 @@
                                 <table class="table table-striped table-bordered w-100" style="width: 100% !important;">
                                     <thead>
                                         <tr>
-                                            <th style="width: 10%;">ID</th>
+                                            <th style="width: 7%;">ID</th>
                                             <th style="width: 20%;">Cliente.</th>
-                                            <th style="width: 15%;">Teléfono</th>
-                                            <th style="width: 15%;">Monto</th>
-                                            <th style="width: 10%;">%</th>
-                                            <th style="width: 15%;"># Cuotas</th>
-                                            <th style="width: 15%;">T. a pagar</th>
-                                            <th style="width: 15%;">Accion</th>
+                                            <th style="width: 13%;">Teléfono</th>
+                                            <th style="width: 10%;">Monto</th>
+                                            <th style="width: 8%;">%</th>
+                                            <th style="width: 10%;"># Cuotas</th>
+                                            <th style="width: 10%;">T. a pagar</th>
+                                            <th style="width: 12%;">Estado</th>
+                                            <th style="width: 10%;">Accion</th>
                                         </tr>
                                     </thead>
                                     <tbody>

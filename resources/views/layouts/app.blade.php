@@ -88,25 +88,23 @@
             $('#client_id').select2({
                 width: '100%',
                 placeholder: '-- Seleccionar cliente --',
+                allowClear: true,
                 minimumInputLength: 0,
+
                 language: {
-                    inputTooShort: function () {
-                        return "Buscar por nombre o DNI...";
-                    },
-                    searching: function () {
-                        return "Buscando...";
-                    },
-                    noResults: function () {
-                        return "No se encontraron resultados";
-                    }
+                    searching: () => "Buscando...",
+                    noResults: () => "No se encontraron resultados",
+                    inputTooShort: () => "Escriba para buscar...",
+                    searchPlaceholder: "Buscar por nombre o DNI..." // ✅ ESTE ES EL QUE FUNCIONA
                 },
+
                 ajax: {
                     url: '/clients/search',
                     dataType: 'json',
                     delay: 300,
                     data: function (params) {
                         return {
-                            q: params.term
+                            q: params.term ?? ''
                         };
                     },
                     processResults: function (data) {
@@ -116,10 +114,10 @@
                                 text: item.name + ' — ' + item.numero_doc
                             }))
                         };
-                    },
-                    cache: true
+                    }
                 }
             });
+            
 
         });
     </script>
