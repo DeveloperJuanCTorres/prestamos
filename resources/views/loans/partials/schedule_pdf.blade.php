@@ -76,6 +76,7 @@
 
     <div class="info">
         <p><strong>Cliente:</strong> {{ $loan->client->name }} ({{ $loan->client->numero_doc }})</p>
+        <p><strong>Fecha:</strong> {{$loan->created_at->format('d/m/Y') }}</p>
         <p><strong>Tipo de pago:</strong> {{ $loan->type->name }}</p>
         <p><strong>Monto prestado:</strong> S/. {{ number_format($loan->amount, 2) }}</p>
         <p><strong>% Interés:</strong> {{ number_format($loan->interest_percent,2) }}%</p>
