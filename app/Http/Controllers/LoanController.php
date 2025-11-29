@@ -193,13 +193,31 @@ class LoanController extends Controller
         ]);
     }
 
+    // public function printSchedule($id)
+    // {
+    //     $loan = Loan::with('payments')->findOrFail($id);
+
+    //     $pdf = Pdf::loadView('loans.partials.schedule_pdf', compact('loan'));
+    //     // return $pdf->download('cronograma_prestamo_'.$loan->id.'.pdf');
+    //     return $pdf->stream('cronograma_'.$loan->id.'_'.time().'.pdf');
+    // }
+
     public function printSchedule($id)
     {
         $loan = Loan::with('payments')->findOrFail($id);
 
-        $pdf = Pdf::loadView('loans.partials.schedule_pdf', compact('loan'));
-        // return $pdf->download('cronograma_prestamo_'.$loan->id.'.pdf');
-        return $pdf->stream('cronograma_'.$loan->id.'_'.time().'.pdf');
+        // Forzar nueva instancia del PDF
+        $pdf = app('dompdf.wrapper');
+        $pdf->loadView('loans.partials.schedule_pdf', compact('loan'));
+
+        return response()->make($pdf->output(), 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition'=> 'inline; filename="cronograma_'.$loan->id.'_'.time().'.pdf"',
+            'Cache-Control'      => 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+            'Pragma'             => 'no-cache',
+            'Expires'            => '0',
+            'Surrogate-Control'  => 'no-store',
+        ]);
     }
 
     public function ticket($id)
