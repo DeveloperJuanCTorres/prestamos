@@ -198,7 +198,13 @@ class LoanController extends Controller
         $loan = Loan::with('payments')->findOrFail($id);
 
         $pdf = Pdf::loadView('loans.partials.schedule_pdf', compact('loan'));
-        return $pdf->download('cronograma_prestamo_'.$loan->id.'.pdf');
+        // return $pdf->download('cronograma_prestamo_'.$loan->id.'.pdf');
+        return response($pdf->output(), 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'inline; filename="cronograma_prestamo_'.$loan->id.'.pdf"')
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
     }
 
     public function ticket($id)
