@@ -27,8 +27,9 @@
 
             <!-- Botón imprimir cronograma -->
             <div class="mb-3">
-                <a href="{{ route('loans.printSchedule', $loan->id) }}" 
-                   class="btn btn-danger" target="_blank">
+                <a href="{{ route('loans.printSchedule', $loan->id) }}?v={{ time() }}"
+                class="btn btn-danger"
+                target="_blank">
                     <i class="fa fa-print"></i> Imprimir cronograma
                 </a>
             </div>
