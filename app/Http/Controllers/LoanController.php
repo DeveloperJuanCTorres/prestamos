@@ -198,7 +198,7 @@ class LoanController extends Controller
         $loan = Loan::with('payments')->findOrFail($id);
 
         $pdf = Pdf::loadView('loans.partials.schedule_pdf', compact('loan'));
-        return $pdf->stream('cronograma_prestamo_'.$loan->id.'.pdf');
+        return $pdf->download('cronograma_prestamo_'.$loan->id.'.pdf');
     }
 
     public function ticket($id)
