@@ -47,10 +47,26 @@
             </a>
 
             <ul id="menuReportes" class="collapse">
-                <li class="py-2"><a href="#">Reporte General</a></li>
-                <li class="py-2"><a href="#">Reporte de Clientes</a></li>
-                <li class="py-2"><a href="#">Reporte de Préstamos</a></li>
-                <li class="py-2"><a href="#">Reporte de Pagos</a></li>
+                <li class="py-2">
+                    <a href="{{ route('reporte.general') }}" target="_blank" class="btn btn-info text-white">
+                        Reporte General
+                    </a>
+                </li>
+                <li class="py-2">
+                    <a href="{{ route('reporte.clientes') }}" target="_blank" class="btn btn-info text-white">
+                        Reporte de Clientes
+                    </a>
+                </li>
+                <!-- <li class="py-2">
+                    <a href="{{ route('reporte.prestamos') }}" target="_blank" class="btn btn-info text-white">
+                        Reporte de Préstamos
+                    </a>
+                </li> -->
+                <li class="py-2">
+                    <a href="{{ route('reporte.pagos') }}" target="_blank" class="btn btn-info text-white">
+                        Reporte de Pagos
+                    </a>
+                </li>
             </ul>
         </li>       
 

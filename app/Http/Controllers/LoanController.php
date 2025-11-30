@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
 use App\Models\Loan;
 use App\Models\LoanPayment;
 use App\Models\Type;
@@ -228,5 +229,110 @@ class LoanController extends Controller
                 ->setPaper([0, 0, 203, 300]); // Formato ticket 80mm
 
         return $pdf->stream('ticket_pago_'.$payment->id.'.pdf');
+    }
+
+    public function reporteGeneral()
+    {
+        $prestamos = Loan::with(['client', 'payments'])->get();
+
+        $totalPrestado = $prestamos->sum('amount');
+        $totalPagado = $prestamos->sum(function ($loan) {
+            return $loan->payments->where('paid', 1)->sum('amount');
+        });
+
+        $totalPorCobrar = $totalPrestado - $totalPagado;
+
+        // Conteo de estados
+        $pagados = 0;
+        $pendientes = 0;
+
+        foreach ($prestamos as $loan) {
+            $pagado = $loan->payments->where('paid', 1)->sum('amount');
+            $saldo = $loan->total_to_pay - $pagado;
+
+            if ($saldo <= 0) $pagados++;
+            else $pendientes++;
+        }
+
+        $pdf = Pdf::loadView('loans.reports.general', compact(
+            'prestamos',
+            'totalPrestado',
+            'totalPagado',
+            'totalPorCobrar',
+            'pagados',
+            'pendientes'
+        ));
+
+        return $pdf->stream('reporte_general_prestamos.pdf');
+    }
+
+    public function reporteClientes()
+    {
+        $clientes = Client::with(['loans.payments'])->get();
+
+        $totalClientes = $clientes->count();
+
+        $totalPrestado = 0;
+        $totalPagado = 0;
+        $totalPorCobrar = 0;
+
+        foreach ($clientes as $cliente) {
+            foreach ($cliente->loans as $loan) {
+                $pagado = $loan->payments->where('paid', 1)->sum('amount');
+
+                $totalPrestado += $loan->amount;
+                $totalPagado += $pagado;
+                $totalPorCobrar += ($loan->total_to_pay - $pagado);
+            }
+        }
+
+        $pdf = Pdf::loadView('reports.clientes', compact(
+            'clientes',
+            'totalClientes',
+            'totalPrestado',
+            'totalPagado',
+            'totalPorCobrar'
+        ));
+
+        return $pdf->stream('reporte_clientes.pdf');
+    }
+
+    public function reportePrestamos()
+    {
+        $prestamos = Loan::with(['client', 'payments'])->get();
+
+        $totalPrestado = $prestamos->sum('amount');
+
+        $totalPagado = $prestamos->sum(function ($loan) {
+            return $loan->payments->where('paid', 1)->sum('amount');
+        });
+
+        $totalPorCobrar = $totalPrestado - $totalPagado;
+
+        $pdf = Pdf::loadView('reports.prestamos', compact(
+            'prestamos',
+            'totalPrestado',
+            'totalPagado',
+            'totalPorCobrar'
+        ));
+
+        return $pdf->stream('reporte_prestamos.pdf');
+    }
+
+    public function reportePagos()
+    {
+         // Traemos todos los préstamos con sus pagos y cliente
+        $prestamos = Loan::with(['client', 'payments' => function($q) {
+            $q->orderBy('cuota', 'asc');
+        }])->get();
+
+        $totalPagadoGeneral = 0;
+        foreach ($prestamos as $loan) {
+            $totalPagadoGeneral += $loan->payments->where('paid', 1)->sum('amount');
+        }
+
+        $pdf = Pdf::loadView('reports.pagos', compact('prestamos', 'totalPagadoGeneral'));
+
+        return $pdf->stream('reporte_pagos_agrupados.pdf');
     }
 }

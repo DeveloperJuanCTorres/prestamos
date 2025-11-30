@@ -55,6 +55,18 @@ Route::post('payments/{id}/pay', [LoanController::class, 'pay'])->name('payments
 Route::get('loans/{id}/print-schedule', [LoanController::class, 'printSchedule'])->name('loans.printSchedule');
 Route::get('payments/{id}/ticket', [LoanController::class, 'ticket'])->name('payments.ticket');
 
+Route::get('/reporte-general', [LoanController::class, 'reporteGeneral'])
+    ->name('reporte.general');
+
+Route::get('/reporte-clientes', [LoanController::class, 'reporteClientes'])
+->name('reporte.clientes');
+
+Route::get('/reporte-prestamos', [LoanController::class, 'reportePrestamos'])
+    ->name('reporte.prestamos');
+
+Route::get('/reporte-pagos', [LoanController::class, 'reportePagos'])
+->name('reporte.pagos');
+
 // Endpoint AJAX para límites
 Route::get('/types/{id}/limits', [LoanController::class, 'typeLimits'])->name('types.limits');
 

@@ -21,4 +21,9 @@ class Client extends Model
     ];
 
     protected $dates = ['deleted_at'];
+
+    public function loans()
+    {
+        return $this->hasMany(Loan::class);
+    }
 }
