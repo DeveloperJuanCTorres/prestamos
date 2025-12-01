@@ -32,14 +32,15 @@ class HomeController extends Controller
         $clients = Client::count();
         $loan_payments = LoanPayment::all();
         $total_prestamos = $loans->count();
+        $hoy = Carbon::now('America/Lima')->toDateString();
 
-        $prestamosVencidos = Loan::whereHas('payments', function ($q) {
+        $prestamosVencidos = Loan::whereHas('payments', function ($q) use ($hoy) {
             $q->where('paid', 0)
-            ->where('due_date', '<', today());
+            ->whereDate('due_date', '<=', $hoy);
         })
-        ->with(['payments' => function ($q) {
+        ->with(['payments' => function ($q) use ($hoy) {
             $q->where('paid', 0)
-            ->where('due_date', '<', today());
+            ->whereDate('due_date', '<=', $hoy);
         }])
         ->get();
 
