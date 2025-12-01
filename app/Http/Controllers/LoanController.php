@@ -182,6 +182,115 @@ class LoanController extends Controller
         return view('loans.show', compact('loan'));
     }
 
+    public function edit(Loan $loan)
+    {
+        if ($loan->hasAnyPaidPayment()) {
+            return redirect()->route('loans.index')
+                ->with('error', 'Este préstamo no se puede editar porque ya tiene cuotas pagadas.');
+        }
+        $types = Type::orderBy('name')->get();
+
+        return view('loans.edit', compact('loan','types'));
+    }
+
+    public function update(Request $request, Loan $loan)
+    {
+        if ($loan->hasAnyPaidPayment()) {
+            return back()->with('error', 'No se puede modificar un préstamo con cuotas pagadas.');
+        }
+
+        $request->validate([
+            'amount' => 'required|numeric|min:1',
+            'type_id' => 'required|exists:types,id',
+            'interest_percent' => 'required|numeric',
+        ]);
+
+        $type = Type::findOrFail($request->type_id);
+
+        // validar rango de interés según tipo (server-side)
+        $min = (float)$type->minimo;
+        $max = (float)$type->maximo;
+        $interestPercent = (float)$request->interest_percent;
+
+        if ($interestPercent < $min || $interestPercent > $max) {
+            return back()
+                ->withInput()
+                ->withErrors(['interest_percent' => "El % de interés debe estar entre {$min}% y {$max}% para el tipo {$type->name}."]);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $amount = round((float)$request->amount, 2);
+
+            // Cálculo de interés simple
+            $interestAmount = round($amount * ($interestPercent / 100), 2);
+            $totalToPay = round($amount + $interestAmount, 2);
+
+            $numPayments = (int) $type->num_payments;
+            $periodDays  = (int) $type->periodicity_days;
+
+            if ($numPayments <= 0) {
+                throw new \Exception('El tipo seleccionado no tiene número de cuotas válido.');
+            }
+
+            // ✅ ACTUALIZAR PRÉSTAMO
+            $loan->update([
+                'type_id'        => $request->type_id,
+                'amount'         => $amount,
+                'interest_percent'=> $interestPercent,
+                'interest_amount'=> $interestAmount,
+                'total_to_pay'   => $totalToPay,
+                'num_payments'   => $numPayments,
+            ]);
+
+            // ✅ ELIMINAR CUOTAS ANTIGUAS
+            $loan->payments()->delete();
+
+            // ✅ CALCULAR CUOTAS NUEVAS (MISMA LÓGICA DEL STORE)
+            $basePayment = ceil(($totalToPay * 100 / $numPayments) / 10) / 10;
+
+            $payments = [];
+            $currentDate = Carbon::now()->addDays($periodDays);
+            $accumulated = 0;
+
+            for ($i = 1; $i <= $numPayments; $i++) {
+                if ($i < $numPayments) {
+                    $amt = $basePayment;
+                    $accumulated += $amt;
+                } else {
+                    $amt = round($totalToPay - $accumulated, 2);
+                }
+
+                $payments[] = [
+                    'loan_id'    => $loan->id,
+                    'due_date'   => $currentDate->toDateString(),
+                    'amount'     => $amt,
+                    'paid'       => 0,
+                    'cuota'      => $i,
+                    'created_at'=> now(),
+                    'updated_at'=> now(),
+                ];
+
+                $currentDate = $currentDate->copy()->addDays($periodDays);
+            }
+
+            // ✅ INSERTAR NUEVAS CUOTAS
+            LoanPayment::insert($payments);
+
+            DB::commit();
+
+            return redirect()->route('loans.show', $loan->id)
+                ->with('success', 'Préstamo actualizado y cronograma regenerado correctamente.');
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return back()->withInput()
+                ->withErrors(['error' => 'Error al actualizar préstamo: ' . $e->getMessage()]);
+        }
+    }
+
+
     public function pay($id)
     {
         $payment = LoanPayment::findOrFail($id);

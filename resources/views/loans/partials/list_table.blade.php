@@ -29,6 +29,13 @@
                             <i class="fa fa-eye me-2"></i> Detalle
                         </a>
                     </li>
+                    @if (!$loan->hasAnyPaidPayment())
+                        <li>
+                            <a class="dropdown-item" href="{{ route('loans.edit', $loan->id) }}">
+                                <i class="fa fa-pencil me-2"></i> Editar
+                            </a>
+                        </li>
+                    @endif
                     <!-- <li>
                         <a class="dropdown-item loan-edit" href="javascript:void(0);"
                             data-id="{{ $loan->id }}">

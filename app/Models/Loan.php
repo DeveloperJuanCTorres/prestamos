@@ -38,4 +38,9 @@ class Loan extends Model
     {
         return $this->payments()->where('paid', 0)->count() === 0 ? 'pagado' : 'pendiente';
     }
+
+    public function hasAnyPaidPayment()
+    {
+        return $this->payments()->where('paid', 1)->exists();
+    }
 }

@@ -45,7 +45,7 @@ Route::post('/types/update', [TypeController::class, 'update'])->name('types.upd
 Route::post('/types/delet', [TypeController::class, 'destroy'])->name('types.delet');
 
 
-Route::get('/prestamos', [LoanController::class, 'index']);
+Route::get('/prestamos', [LoanController::class, 'index'])->name('loans.index');
 Route::get('/loans/list', [LoanController::class, 'list'])->name('loans.list');
 Route::get('/loans/create', [LoanController::class, 'create'])->name('loans.create');
 Route::post('/loans', [LoanController::class, 'store'])->name('loans.store');
@@ -54,6 +54,10 @@ Route::get('/loans/{loan}', [LoanController::class, 'show'])->name('loans.show')
 Route::post('payments/{id}/pay', [LoanController::class, 'pay'])->name('payments.pay');
 Route::get('loans/{id}/print-schedule', [LoanController::class, 'printSchedule'])->name('loans.printSchedule');
 Route::get('payments/{id}/ticket', [LoanController::class, 'ticket'])->name('payments.ticket');
+
+Route::get('loans/{loan}/edit', [LoanController::class, 'edit'])->name('loans.edit');
+Route::put('loans/{loan}', [LoanController::class, 'update'])->name('loans.update');
+
 
 Route::get('/reporte-general', [LoanController::class, 'reporteGeneral'])
     ->name('reporte.general');
