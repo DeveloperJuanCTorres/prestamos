@@ -340,6 +340,56 @@ class LoanController extends Controller
         return $pdf->stream('ticket_pago_'.$payment->id.'.pdf');
     }
 
+    /**
+     * Nuevo endpoint para datos del ticket (JSON)
+     * Usado por Web Bluetooth API
+     */
+    public function ticketData($id)
+    {
+        $payment = LoanPayment::with('loan.client')->findOrFail($id);
+        
+        // Calcular saldo pendiente
+        $totalPagado = $payment->loan->payments()
+                        ->where('paid', 1)
+                        ->sum('amount');
+        $saldoPendiente = $payment->loan->total_to_pay - $totalPagado;
+        
+        $ticketData = [
+            'cliente' => $payment->loan->client->name,
+            'documento' => $payment->loan->client->numero_doc,
+            'prestamo_id' => $payment->loan_id,
+            'cuota' => $payment->cuota,
+            'total_cuotas' => $payment->loan->type->num_payments,
+            'monto' => number_format($payment->amount, 2),
+            'saldo' => number_format($saldoPendiente, 2),
+            'fecha' => now()->format('d/m/Y H:i'),
+            'payment_id' => $payment->id
+        ];
+
+        // Detectar tipo de dispositivo
+        $userAgent = request()->header('User-Agent', '');
+        $isAndroid = strpos($userAgent, 'Android') !== false;
+        $isIOS = strpos($userAgent, 'iPhone') !== false || strpos($userAgent, 'iPad') !== false;
+        $isChrome = strpos($userAgent, 'Chrome') !== false;
+        $isEdge = strpos($userAgent, 'Edg') !== false;
+        
+        $supportsWebBluetooth = !$isIOS && ($isChrome || $isEdge);
+        
+        return response()->json([
+            'ticket_data' => $ticketData,
+            'device_info' => [
+                'supports_bluetooth' => $supportsWebBluetooth,
+                'is_android' => $isAndroid,
+                'is_ios' => $isIOS,
+                'recommended_action' => $supportsWebBluetooth ? 'bluetooth' : ($isIOS ? 'share' : 'download')
+            ],
+            'urls' => [
+                'pdf_url' => route('payments.ticket', $id),
+                'bluetooth_data_url' => route('payments.ticket.data', $id)
+            ]
+        ]);
+    }
+
     public function reporteGeneral()
     {
         $prestamos = Loan::with(['client', 'payments'])->get();

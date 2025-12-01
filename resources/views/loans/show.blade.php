@@ -55,11 +55,9 @@
                                     @if($p->paid)
                                         <!-- <span class="badge bg-success">PAGADO</span> -->
 
-                                        <a href="{{ route('payments.ticket', $p->id) }}" 
-                                        class="btn btn-dark btn-sm" 
-                                        target="_blank">
+                                        <button class="btn btn-dark btn-sm btn-print-ticket" data-id="{{ $p->id }}">
                                             <i class="fa fa-print"></i> Ticket
-                                        </a>
+                                        </button>
 
                                     @else
                                         <button class="btn btn-primary btn-sm btn-pay" data-id="{{ $p->id }}">
@@ -85,36 +83,13 @@
 </div>
 
 @push('script')
+<!-- Incluir módulo Bluetooth -->
+<script src="{{ asset('js/bluetooth-printer.js') }}"></script>
 
-<!-- <script>
-document.addEventListener("DOMContentLoaded", function() {
-    document.querySelectorAll('.btn-pay').forEach(btn => {
-        btn.addEventListener('click', function() {
-            let paymentId = this.getAttribute('data-id');
-
-            Swal.fire({
-                title: '¿Confirmar pago?',
-                text: "Esta acción marcará la cuota como pagada.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, pagar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-
-                    // Procesar pago
-                    window.location.href = "/payments/" + paymentId + "/pay?print=1";
-
-                }
-            });
-        });
-    });
-});
-</script> -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+    
+    // Manejar clics en botón "Pagar"
     document.querySelectorAll('.btn-pay').forEach(btn => {
         btn.addEventListener('click', function() {
             let paymentId = this.getAttribute('data-id');
@@ -143,10 +118,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     .then(data => {
 
                         if (data.success) {
-
-                            // Abrir ticket en nueva pestaña
-                            // window.open(`/payments/${data.payment_id}/ticket`, "_blank");
-
                             Swal.fire(
                                 'Pagado',
                                 'La cuota ha sido marcada como pagada.',
@@ -161,6 +132,131 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         });
     });
+
+    // Nueva funcionalidad: Manejar impresión de tickets inteligente
+    document.querySelectorAll('.btn-print-ticket').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const paymentId = this.getAttribute('data-id');
+            
+            try {
+                // Obtener datos del ticket y información del dispositivo
+                const response = await fetch(`/payments/${paymentId}/ticket-data`);
+                const data = await response.json();
+                
+                const { ticket_data, device_info, urls } = data;
+                
+                // Mostrar opciones según capacidades del dispositivo
+                if (device_info.supports_bluetooth) {
+                    // Dispositivo compatible con Web Bluetooth
+                    showBluetoothOptions(ticket_data, urls);
+                } else if (device_info.is_ios) {
+                    // iOS - ofrecer compartir PDF
+                    showIOSOptions(urls);
+                } else {
+                    // Fallback - abrir PDF
+                    window.open(urls.pdf_url, '_blank');
+                }
+                
+            } catch (error) {
+                console.error('Error obteniendo datos del ticket:', error);
+                // Fallback en caso de error
+                window.open(`/payments/${paymentId}/ticket`, '_blank');
+            }
+        });
+    });
+
+    /**
+     * Mostrar opciones para dispositivos con Bluetooth
+     */
+    function showBluetoothOptions(ticketData, urls) {
+        Swal.fire({
+            title: 'Opciones de Impresión',
+            text: 'Selecciona cómo quieres imprimir el ticket:',
+            icon: 'question',
+            showCancelButton: true,
+            showDenyButton: true,
+            confirmButtonText: '<i class="fa fa-bluetooth"></i> Impresora Bluetooth',
+            denyButtonText: '<i class="fa fa-file-pdf"></i> Abrir PDF',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#007bff',
+            denyButtonColor: '#6c757d'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                printViaBluetooth(ticketData);
+            } else if (result.isDenied) {
+                window.open(urls.pdf_url, '_blank');
+            }
+        });
+    }
+
+    /**
+     * Mostrar opciones para iOS
+     */
+    function showIOSOptions(urls) {
+        Swal.fire({
+            title: 'Imprimir Ticket',
+            text: 'En iOS, abre el PDF para compartir o imprimir via AirPrint',
+            icon: 'info',
+            confirmButtonText: '<i class="fa fa-share"></i> Abrir PDF',
+            confirmButtonColor: '#007bff'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.open(urls.pdf_url, '_blank');
+            }
+        });
+    }
+
+    /**
+     * Imprimir via Bluetooth
+     */
+    async function printViaBluetooth(ticketData) {
+        try {
+            const printer = window.bluetoothPrinter;
+            
+            if (!printer.isSupported) {
+                throw new Error('Tu dispositivo no soporta impresión Bluetooth');
+            }
+
+            // Mostrar loading
+            Swal.fire({
+                title: 'Conectando...',
+                text: 'Buscando impresora Bluetooth',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Conectar a impresora
+            await printer.connect();
+            
+            // Imprimir
+            await printer.print(ticketData);
+            
+            Swal.fire({
+                title: '¡Éxito!',
+                text: 'Ticket enviado a la impresora',
+                icon: 'success',
+                timer: 2000
+            });
+
+        } catch (error) {
+            console.error('Error imprimiendo:', error);
+            
+            Swal.fire({
+                title: 'Error de Impresión',
+                text: error.message || 'No se pudo conectar a la impresora Bluetooth',
+                icon: 'error',
+                showCancelButton: true,
+                confirmButtonText: 'Abrir PDF como alternativa',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.open(`/payments/${ticketData.payment_id}/ticket`, '_blank');
+                }
+            });
+        }
+    }
 });
 </script>
 @endpush
