@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\TypeController;
@@ -75,7 +76,11 @@ Route::get('/reporte-pagos', [LoanController::class, 'reportePagos'])
 // Endpoint AJAX para límites
 Route::get('/types/{id}/limits', [LoanController::class, 'typeLimits'])->name('types.limits');
 
-Route::get('/calendar', [App\Http\Controllers\CalendarController::class, 'index']);
+Route::get('/calendar', [CalendarController::class, 'index']);
+Route::get('/events', [CalendarController::class, 'load']);
+Route::post('/events', [CalendarController::class, 'store']);
+Route::put('/events/{id}', [CalendarController::class, 'update']);
+Route::delete('/events/{id}', [CalendarController::class, 'destroy']);
 
 
 Route::group(['prefix' => 'admin'], function () {

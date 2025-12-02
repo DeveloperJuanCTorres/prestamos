@@ -108,7 +108,7 @@
 
         <tr>
             <td><strong>Fecha pago:</strong></td>
-            <td>{{ \Carbon\Carbon::parse($payment->paid_at)->format('d/m/Y') }}</td>
+            <td>{{ \Carbon\Carbon::parse($payment->updated_at)->format('d/m/Y') }}</td>
         </tr>
     </table>
 

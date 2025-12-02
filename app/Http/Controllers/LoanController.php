@@ -362,7 +362,7 @@ class LoanController extends Controller
             'total_cuotas' => $payment->loan->type->num_payments,
             'monto' => number_format($payment->amount, 2),
             'saldo' => number_format($saldoPendiente, 2),
-            'fecha' => now()->format('d/m/Y H:i'),
+            'fecha' => $payment->updated_at->format('d/m/Y H:i'),
             'payment_id' => $payment->id
         ];
 
