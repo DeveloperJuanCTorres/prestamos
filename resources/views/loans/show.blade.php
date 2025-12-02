@@ -85,6 +85,7 @@
 @push('script')
 <!-- Incluir módulo Bluetooth -->
 <script src="{{ asset('js/bluetooth-printer.js') }}"></script>
+<!-- <script src="{{ asset('bluetooth-printer-adv7010.js') }}"></script> -->
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
