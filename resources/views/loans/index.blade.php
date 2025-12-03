@@ -72,8 +72,7 @@
 
     <a href="javaScript:void();" class="back-to-top"><i class="fa fa-angle-double-up"></i></a>
 
-    
-    @include('partials.config')
+   
     @include('partials.footer')
 
 </div>

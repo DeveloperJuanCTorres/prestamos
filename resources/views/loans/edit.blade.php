@@ -123,7 +123,6 @@
     </a>
 
     @include('partials.footer')
-    @include('partials.config')
 </div>
 
 @push('scripts')

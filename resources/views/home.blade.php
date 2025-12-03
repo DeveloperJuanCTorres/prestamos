@@ -162,7 +162,7 @@
                     <div class="col-12 col-lg-12">
                         <div class="card">
                             <div class="card-header">Cuentas por cobrar
-                                <div class="card-action">
+                                <!-- <div class="card-action">
                                     <div class="dropdown">
                                         <a href="javascript:void();" class="dropdown-toggle dropdown-toggle-nocaret" data-toggle="dropdown">
                                             <i class="icon-options"></i>
@@ -175,9 +175,9 @@
                                             <a class="dropdown-item" href="javascript:void();">Separated link</a>
                                         </div>
                                     </div>
-                                </div>
+                                </div> -->
                             </div>
-                            <div class="table-responsive">
+                            <div class="table-responsive d-none d-md-block">
                                 <table class="table align-items-center table-flush table-borderless">
                                     <thead>
                                         <tr>
@@ -210,6 +210,51 @@
                                     </tbody>
                                 </table>
                             </div>
+                            {{-- VISTA EN CARDS - SOLO MÓVIL --}}
+                            <div class="d-block d-md-none">
+                                @foreach ($prestamosVencidos as $prestamo)
+                                    @foreach ($prestamo->payments as $cuota)
+
+                                        <div class="card mb-3 shadow-sm border-0">
+                                            <div class="card-body p-3">
+
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <strong>Cliente:</strong>
+                                                    <span>{{ $prestamo->client->name }}</span>
+                                                </div>
+
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <strong>Préstamo:</strong>
+                                                    <span>#{{ $prestamo->id }}</span>
+                                                </div>
+
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <strong>Monto:</strong>
+                                                    <span>S/. {{ number_format($prestamo->amount, 2) }}</span>
+                                                </div>
+
+                                                <div class="d-flex justify-content-between mb-2 text-danger">
+                                                    <strong>Por cobrar:</strong>
+                                                    <span>S/. {{ number_format($cuota->amount, 2) }}</span>
+                                                </div>
+
+                                                <div class="d-flex justify-content-between mb-3">
+                                                    <strong>Fecha:</strong>
+                                                    <span>{{ \Carbon\Carbon::parse($cuota->due_date)->format('d/m/Y') }}</span>
+                                                </div>
+
+                                                <div class="d-grid">
+                                                    <a href="{{ route('loans.show', $prestamo->id) }}" class="btn btn-primary btn-sm">
+                                                        Ver Préstamo
+                                                    </a>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                    @endforeach
+                                @endforeach
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -233,7 +278,7 @@
         
         
         
-        @include('partials.config')
+        
         @include('partials.footer')
     </div>
     <!--End wrapper-->

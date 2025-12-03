@@ -1,7 +1,7 @@
 <!--Start sidebar-wrapper-->
 <div id="sidebar-wrapper" data-simplebar="" data-simplebar-auto-hide="true">
     <div class="brand-logo">
-        <a href="index.html">
+        <a href="/">
             <img src="{{asset ('assets/images/logo-icon.png')}}" class="logo-icon" alt="logo icon">
             <h5 class="logo-text">Préstamos</h5>
         </a>
@@ -62,11 +62,11 @@
                         Reporte de Préstamos
                     </a>
                 </li> -->
-                <li class="py-2">
+                <!-- <li class="py-2">
                     <a href="{{ route('reporte.pagos') }}" target="_blank" class="btn btn-info text-white">
                         Reporte de Pagos
                     </a>
-                </li>
+                </li> -->
             </ul>
         </li>       
 

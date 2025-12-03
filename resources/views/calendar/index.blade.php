@@ -40,8 +40,6 @@
         <!--End Back To Top Button-->
 
         @include('partials.footer')
-        
-        @include('partials.config')
     
     </div>
     <!--End wrapper-->

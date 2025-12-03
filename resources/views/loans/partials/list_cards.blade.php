@@ -26,8 +26,13 @@
 
         <div class="mt-2 d-flex justify-content-end">
             <a href="{{ route('loans.show', $loan->id) }}" class="btn btn-sm btn-primary mr-1">
-                <i class="fa fa-eye px-2"></i>Ver detalle
+                <i class="fa fa-eye px-2"></i>Detalle
             </a>
+            @if (!$loan->hasAnyPaidPayment())
+            <a class="btn btn-sm btn-warning mr-1" href="{{ route('loans.edit', $loan->id) }}">
+                <i class="fa fa-pencil me-2"></i> Editar
+            </a>
+            @endif
         </div>
 
     </div>

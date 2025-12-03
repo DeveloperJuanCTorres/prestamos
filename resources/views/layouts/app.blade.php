@@ -122,6 +122,80 @@
         });
     </script>
 
+    <script>
+        (function () {
+
+            function initSidebarAutoClose() {
+                var wrapper = document.getElementById('wrapper');
+                var sidebar = document.getElementById('sidebar-wrapper'); // ✅ TU MENÚ REAL
+                var overlay = document.querySelector('.overlay');
+                var toggleBtn = document.querySelector('.toggle-menu');
+
+                if (!wrapper || !sidebar) return;
+
+                function closeSidebar() {
+                    if (wrapper.classList.contains('toggled')) {
+                        wrapper.classList.remove('toggled');
+                        if (overlay) overlay.classList.remove('active');
+                    }
+                }
+
+                // ✅ BLOQUEAR TOTALMENTE CLICKS DENTRO DEL MENÚ
+                sidebar.addEventListener('click', function (e) {
+                    // Si es un botón de collapse (submenu), dejar que Bootstrap actúe
+                    if (e.target.closest('[data-toggle="collapse"], [data-bs-toggle="collapse"]')) {
+                        return; // ✅ permite que se despliegue el submenú
+                    }
+                    // Para cualquier otro click dentro del menú, no cerrar
+                    e.stopPropagation();
+                }, true);
+
+                sidebar.addEventListener('touchstart', function (e) {
+                    if (e.target.closest('[data-toggle="collapse"], [data-bs-toggle="collapse"]')) {
+                        return;
+                    }
+                    e.stopPropagation();
+                }, true);
+
+                // ✅ EL OVERLAY SÍ CIERRA
+                if (overlay) {
+                    overlay.addEventListener('click', function () {
+                        closeSidebar();
+                    });
+                }
+
+                // ✅ SOLO CIERRA SI EL CLICK ES FUERA
+                function globalCloseHandler(e) {
+                    var target = e.target;
+
+                    if (!wrapper.classList.contains('toggled')) return;
+
+                    // ❌ NO cerrar si el click fue dentro del menú
+                    if (sidebar.contains(target)) return;
+
+                    // ❌ NO cerrar si el click fue el botón de abrir
+                    if (toggleBtn && toggleBtn.contains(target)) return;
+
+                    // ✅ SI ES FUERA, SE CIERRA
+                    closeSidebar();
+                }
+
+                document.addEventListener('click', globalCloseHandler, true);
+                document.addEventListener('touchstart', globalCloseHandler, true);
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initSidebarAutoClose);
+            } else {
+                initSidebarAutoClose();
+            }
+
+        })();
+    </script>
+
+
+
+
 
 
 

@@ -63,6 +63,8 @@
             text-align: center;
             color: #555;
         }
+        .badge-success { background-color: #28a745; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; }
+        .badge-danger { background-color: #dc3545; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; }
     </style>
 </head>
 <body>
@@ -99,7 +101,13 @@
                 <td>{{ $i + 1 }}</td>
                 <td>{{ $p->due_date }}</td>
                 <td>S/. {{ number_format($p->amount, 2) }}</td>
-                <td>{{ $p->paid ? 'PAGADO' : 'PENDIENTE' }}</td>
+                <td>
+                    @if($p->paid == 1)
+                        <span class="badge badge-success">PAGADO</span>
+                    @else
+                        <span class="badge badge-danger">PENDIENTE</span>
+                    @endif
+                </td>
             </tr>
             @endforeach
         </tbody>
