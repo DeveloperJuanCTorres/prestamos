@@ -211,5 +211,6 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
     ])->toArray(),
+    'admin_usernames' => explode(',', env('ADMINISTRATOR_USERNAMES', '')),
 
 ];

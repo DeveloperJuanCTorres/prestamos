@@ -60,6 +60,9 @@ Route::get('payments/{id}/ticket-data', [LoanController::class, 'ticketData'])->
 Route::get('loans/{loan}/edit', [LoanController::class, 'edit'])->name('loans.edit');
 Route::put('loans/{loan}', [LoanController::class, 'update'])->name('loans.update');
 
+Route::post('/payments/{id}/cancelar', [LoanController::class, 'cancelar'])
+        ->name('payments.cancelar');
+
 
 Route::get('/reporte-general', [LoanController::class, 'reporteGeneral'])
     ->name('reporte.general');

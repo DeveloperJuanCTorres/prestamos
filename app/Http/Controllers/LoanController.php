@@ -494,4 +494,24 @@ class LoanController extends Controller
 
         return $pdf->stream('reporte_pagos_agrupados.pdf');
     }
+
+    public function cancelar($id)
+    {
+        // ✅ VALIDACIÓN DE ADMINISTRADOR DESDE .ENV
+        $adminEmails = config('app.admin_usernames');
+
+        if (!auth()->check() || !in_array(auth()->user()->email, $adminEmails)) {
+            abort(403, 'No autorizado para cancelar pagos');
+        }
+
+        // ✅ BUSCAR EL PAGO
+        $payment = LoanPayment::findOrFail($id);
+
+        // ✅ CAMBIAR ESTADO A NO PAGADO
+        $payment->paid = 0;
+        $payment->save();
+
+        // ✅ RESPUESTA
+        return redirect()->back()->with('success', 'Pago cancelado correctamente');
+    }
 }
