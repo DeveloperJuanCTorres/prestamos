@@ -22,9 +22,26 @@
                     <strong>Estado:</strong>
 
                     @if($p->paid)
-                        <button class="btn btn-dark btn-sm btn-print-ticket" data-id="{{ $p->id }}">
-                            <i class="fa fa-print"></i> Ticket
-                        </button>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-dark btn-sm btn-print-ticket" data-id="{{ $p->id }}">
+                                <i class="fa fa-print"></i> Ticket
+                            </button>
+
+                            @php
+                                $adminEmails = config('app.admin_usernames');
+                                $isAdminUser = auth()->check() && in_array(auth()->user()->email, $adminEmails);
+                            @endphp
+
+                            @if($isAdminUser)
+                                <form action="{{ route('payments.cancelar', $p->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="btn btn-danger btn-sm"
+                                        onclick="return confirm('¿Seguro que deseas CANCELAR este pago?')">
+                                        Cancelar
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
                     @else
                         <button class="btn btn-primary btn-sm btn-pay" data-id="{{ $p->id }}">
                             Pagar
