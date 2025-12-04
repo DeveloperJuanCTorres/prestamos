@@ -3,7 +3,7 @@
     <div class="brand-logo">
         <a href="/">
             <img src="{{asset ('assets/images/logo-icon.png')}}" class="logo-icon" alt="logo icon">
-            <h5 class="logo-text">Préstamos</h5>
+            <h5 class="logo-text">CREDI-ANRO</h5>
         </a>
     </div>
     <ul class="sidebar-menu do-nicescrol">
