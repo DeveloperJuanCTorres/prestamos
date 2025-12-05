@@ -83,6 +83,8 @@ class BluetoothPrinter {
 
         commands.push(LF);
         commands.push(ESC, 0x45, 0x01);
+        commands.push(...this.stringToBytes('CREDI-ANRO'));
+        commands.push(LF);
         commands.push(...this.stringToBytes('TICKET DE PAGO'));
         commands.push(ESC, 0x45, 0x00);
         commands.push(LF, LF);

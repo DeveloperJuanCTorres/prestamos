@@ -8,12 +8,12 @@
         body {
             font-family: sans-serif;
             font-size: 12px;
-            margin: 25px;
+            margin: 10px;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         .header img {
@@ -58,7 +58,7 @@
         }
 
         .footer {
-            margin-top: 30px;
+            margin-top: 10px;
             font-size: 11px;
             text-align: center;
             color: #555;
@@ -71,7 +71,15 @@
 
     <div class="header">
         {{-- Logo opcional --}}
-        {{-- <img src="{{ public_path('img/logo.png') }}"> --}}
+        <div style="text-align:center;">
+            <img src="{{ public_path('assets/images/credianro.png') }}" 
+                style="width: 70px; vertical-align:middle; display:inline-block;">
+            <span style="font-size:16px; font-weight:bold; margin-left:8px; 
+                        vertical-align:middle; display:inline-block;">
+                CREDI-ANRO
+            </span>
+        </div>
+        
         <div class="title">Cronograma de Pagos</div>
         <div>Préstamo Nº {{ $loan->id }}</div>
     </div>
