@@ -12,7 +12,7 @@
                 <div class="card-body">
                     <div class="card-content p-2">
                         <div class="text-center">
-                            <img src="assets/images/credianro.png" width="100" alt="logo icon">
+                            <img src="assets/images/logo-credianro.png" width="100" alt="logo icon">
                         </div>
                     <div class="card-title text-uppercase text-center">CREDI-ANRO</div>
                     <form method="POST" action="{{ route('login') }}">

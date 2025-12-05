@@ -2,7 +2,7 @@
 <div id="sidebar-wrapper" data-simplebar="" data-simplebar-auto-hide="true">
     <div class="brand-logo">
         <a href="/">
-            <img src="{{asset ('assets/images/credianro.png')}}" class="logo-icon" alt="logo icon">
+            <img src="{{asset ('assets/images/logo-credianro.png')}}" class="logo-icon" alt="logo icon">
             <h5 class="logo-text">CREDI-ANRO</h5>
         </a>
     </div>
