@@ -72,7 +72,7 @@
     <div class="header">
         {{-- Logo opcional --}}
         <div style="text-align:center;">
-            <img src="{{ public_path('assets/images/logo-credianro.png') }}" 
+            <img src="{{ public_path('assets/images/credianro1.png') }}" 
                 style="width: 70px; vertical-align:middle; display:inline-block;">
             <span style="font-size:16px; font-weight:bold; margin-left:8px; 
                         vertical-align:middle; display:inline-block;">
