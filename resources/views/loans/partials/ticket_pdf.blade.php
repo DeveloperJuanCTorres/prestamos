@@ -81,6 +81,7 @@
         $totalCuotas = $payment->loan->type->num_payments;
         $totalPagado = $payment->loan->payments()
                         ->where('paid', 1)
+                        ->where('cuota', '<=', $payment->cuota)
                         ->sum('amount');
         $saldoPendiente = $payment->loan->total_to_pay - $totalPagado;
     @endphp

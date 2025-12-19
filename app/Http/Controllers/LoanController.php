@@ -351,6 +351,7 @@ class LoanController extends Controller
         // Calcular saldo pendiente
         $totalPagado = $payment->loan->payments()
                         ->where('paid', 1)
+                        ->where('cuota', '<=', $payment->cuota)
                         ->sum('amount');
         $saldoPendiente = $payment->loan->total_to_pay - $totalPagado;
         
