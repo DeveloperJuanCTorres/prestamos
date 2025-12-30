@@ -21,7 +21,7 @@
 
         .wrapper {
             width: 100%;
-            padding: 60px 0 0 0;
+            padding: 20px 0 0 0;
             box-sizing: border-box;
         }
 
@@ -62,6 +62,14 @@
 <body>
 
 <div class="wrapper">
+    <div style="text-align:center;">
+        <img src="{{ public_path('assets/images/credianro1.png') }}" 
+            style="width: 70px; vertical-align:middle; display:inline-block;">
+        <span style="font-size:16px; font-weight:bold; margin-left:8px; 
+                    vertical-align:middle; display:inline-block;">
+            CREDI-ANRO
+        </span>
+    </div>
 
     <div class="title">TICKET DE PAGO</div>
 

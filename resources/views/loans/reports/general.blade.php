@@ -10,6 +10,11 @@
         th, td { border: 1px solid #000; padding: 5px; text-align: center; }
         th { background: #f0f0f0; }
         .resumen td { font-weight: bold; }
+        .titulo-seccion {
+            background: #e9ecef;
+            font-weight: bold;
+            text-align: left;
+        }
     </style>
 </head>
 <body>
@@ -17,6 +22,7 @@
 <h2>REPORTE GENERAL DE PRÉSTAMOS</h2>
 <p><strong>Fecha:</strong> {{ now()->format('d/m/Y') }}</p>
 
+<!-- RESUMEN -->
 <table class="resumen">
     <tr>
         <td>Total Prestado</td>
@@ -35,6 +41,7 @@
     </tr>
 </table>
 
+<!-- DETALLE -->
 <table>
     <thead>
         <tr>
@@ -50,25 +57,79 @@
         </tr>
     </thead>
     <tbody>
-        @foreach($prestamos as $i => $loan)
+
         @php
-            $pagado = $loan->payments->where('paid', 1)->sum('amount');
-            $saldo = $loan->total_to_pay - $pagado;
+            // Separar por estado
+            $pagadosList = $prestamos->filter(function($loan) {
+                return $loan->payments->where('paid', 1)->sum('amount') >= $loan->total_to_pay;
+            })->sortBy(function($loan) {
+                return $loan->client->name;
+            });
+
+            $pendientesList = $prestamos->filter(function($loan) {
+                return $loan->payments->where('paid', 1)->sum('amount') < $loan->total_to_pay;
+            })->sortBy(function($loan) {
+                return $loan->client->name;
+            });
         @endphp
+
+        <!-- PRÉSTAMOS PAGADOS -->
         <tr>
-            <td>{{ $i+1 }}</td>
-            <td>{{ $loan->client->name }}</td>
-            <td>S/ {{ number_format($loan->amount, 2) }}</td>
-            <td>{{ $loan->interest_percent }} %</td>
-            <td>S/ {{ number_format($loan->total_to_pay, 2) }}</td>
-            <td>S/ {{ number_format($pagado, 2) }}</td>
-            <td>S/ {{ number_format($saldo, 2) }}</td>
-            <td>{{ $loan->created_at->format('d/m/Y') }}</td>
-            <td>
-                {{ $saldo == 0 ? 'PAGADO' : 'PENDIENTE' }}
-            </td>
+            <td colspan="9" class="titulo-seccion">PRÉSTAMOS PAGADOS</td>
         </tr>
+
+        @foreach($pagadosList->values() as $i => $loan)
+            @php
+                $pagado = $loan->payments->where('paid', 1)->sum('amount');
+            @endphp
+            <tr>
+                <td>{{ $i + 1 }}</td>
+                <td>{{ $loan->client->name }}</td>
+                <td>S/ {{ number_format($loan->amount, 2) }}</td>
+                <td>{{ $loan->interest_percent }} %</td>
+                <td>S/ {{ number_format($loan->total_to_pay, 2) }}</td>
+                <td>S/ {{ number_format($pagado, 2) }}</td>
+                <td>S/ 0.00</td>
+                <td>{{ $loan->created_at->format('d/m/Y') }}</td>
+                <td>PAGADO</td>
+            </tr>
         @endforeach
+
+        @if($pagadosList->count() == 0)
+            <tr>
+                <td colspan="9">No hay préstamos pagados</td>
+            </tr>
+        @endif
+
+        <!-- PRÉSTAMOS PENDIENTES -->
+        <tr>
+            <td colspan="9" class="titulo-seccion">PRÉSTAMOS PENDIENTES</td>
+        </tr>
+
+        @foreach($pendientesList->values() as $i => $loan)
+            @php
+                $pagado = $loan->payments->where('paid', 1)->sum('amount');
+                $saldo = $loan->total_to_pay - $pagado;
+            @endphp
+            <tr>
+                <td>{{ $i + 1 }}</td>
+                <td>{{ $loan->client->name }}</td>
+                <td>S/ {{ number_format($loan->amount, 2) }}</td>
+                <td>{{ $loan->interest_percent }} %</td>
+                <td>S/ {{ number_format($loan->total_to_pay, 2) }}</td>
+                <td>S/ {{ number_format($pagado, 2) }}</td>
+                <td>S/ {{ number_format($saldo, 2) }}</td>
+                <td>{{ $loan->created_at->format('d/m/Y') }}</td>
+                <td>PENDIENTE</td>
+            </tr>
+        @endforeach
+
+        @if($pendientesList->count() == 0)
+            <tr>
+                <td colspan="9">No hay préstamos pendientes</td>
+            </tr>
+        @endif
+
     </tbody>
 </table>
 
