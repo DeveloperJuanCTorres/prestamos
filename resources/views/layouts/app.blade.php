@@ -90,7 +90,9 @@
      <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>        
+
+     
 
     <script>
         $(document).ready(function () {
@@ -132,7 +134,7 @@
         });
     </script>
 
-    <script>
+    <!-- <script>
         (function () {
 
             function initSidebarAutoClose() {
@@ -201,17 +203,137 @@
             }
 
         })();
+    </script> -->
+
+    <script>
+        (function () {
+
+            function initSidebarAutoClose() {
+                const wrapper  = document.getElementById('wrapper');
+                const sidebar  = document.getElementById('sidebar-wrapper');
+                const overlay  = document.querySelector('.overlay');
+                const toggleBtn = document.querySelector('.toggle-menu');
+
+                if (!wrapper || !sidebar) return;
+
+                function closeSidebar() {
+                    if (wrapper.classList.contains('toggled')) {
+                        wrapper.classList.remove('toggled');
+                        if (overlay) overlay.classList.remove('active');
+                    }
+                }
+
+                // ✅ PERMITIR COLLAPSE (REPORTES)
+                sidebar.addEventListener('click', function (e) {
+
+                    // 👉 SI ES collapse, DEJAR PASAR
+                    if (e.target.closest('[data-toggle="collapse"]')) {
+                        return;
+                    }
+
+                    // 👉 SI ES BOTÓN NORMAL, NO CERRAR SIDEBAR
+                    if (e.target.closest('button, a.btn')) {
+                        e.stopPropagation();
+                        return;
+                    }
+                });
+
+                sidebar.addEventListener('touchstart', function (e) {
+                    if (e.target.closest('[data-toggle="collapse"]')) return;
+                    e.stopPropagation();
+                });
+
+                // Overlay sí cierra
+                if (overlay) overlay.addEventListener('click', closeSidebar);
+
+                // Click fuera cierra
+                document.addEventListener('click', function (e) {
+                    if (!wrapper.classList.contains('toggled')) return;
+
+                    if (sidebar.contains(e.target)) return;
+                    if (toggleBtn && toggleBtn.contains(e.target)) return;
+
+                    closeSidebar();
+                });
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initSidebarAutoClose);
+            } else {
+                initSidebarAutoClose();
+            }
+
+        })();
     </script>
 
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const btn = document.getElementById('btnReporteGeneral');
+            if (!btn) return;
+
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopImmediatePropagation(); // 🔥 evita que el sidebar lo bloquee
+                console.log('CLICK REPORTE');
+
+                Swal.fire({
+                    title: 'Reporte General de Préstamos',
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonText: 'Generar Reporte',
+                    cancelButtonText: 'Cancelar',
+                    allowOutsideClick: false,
+
+                    html: `
+                        <div style="text-align:left">
+                            <label class="text-secondary">
+                                <input type="radio" name="estado" value="ambos" checked>
+                                Ambos
+                            </label><br>
+                            <label class="text-secondary">
+                                <input type="radio" name="estado" value="pagado">
+                                Solo Pagados
+                            </label><br>
+                            <label class="text-insecondaryfo">
+                                <input type="radio" name="estado" value="pendiente">
+                                Solo Pendientes
+                            </label>
+                        </div>
+                    `,
+
+                    preConfirm: () => {
+                        const estado = document.querySelector('input[name="estado"]:checked');
+                        if (!estado) {
+                            Swal.showValidationMessage('Seleccione una opción');
+                            return false;
+                        }
+                        return estado.value;
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const estado = result.value;
+                        window.open(
+                            `{{ route('reporte.general') }}?estado=${estado}&_=${Date.now()}`,
+                            '_blank'
+                        );
+                    }
+                });
+
+            });
+
+        });
+    </script> 
+    
 
 
-
-
+    
 
     <!-- <script src='assets/plugins/fullcalendar/js/moment.min.js'></script>
     <script src='assets/plugins/fullcalendar/js/fullcalendar.min.js'></script>
     <script src="assets/plugins/fullcalendar/js/fullcalendar-custom-script.js"></script> -->
+
 
     @stack('script')
 </body>

@@ -20,9 +20,15 @@
 <body>
 
 <h2>REPORTE GENERAL DE PRÉSTAMOS</h2>
-<p><strong>Fecha:</strong> {{ now()->format('d/m/Y') }}</p>
+<p>
+    <strong>Fecha:</strong> {{ now()->format('d/m/Y') }} <br>
+    <strong>Estado:</strong>
+    @if($estado === 'pagado') PAGADOS
+    @elseif($estado === 'pendiente') PENDIENTES
+    @else AMBOS @endif
+</p>
 
-<!-- RESUMEN -->
+<!-- ================= RESUMEN ================= -->
 <table class="resumen">
     <tr>
         <td>Total Prestado</td>
@@ -41,7 +47,18 @@
     </tr>
 </table>
 
-<!-- DETALLE -->
+@php
+    // ================= SEPARAR Y ORDENAR =================
+    $pagadosList = $prestamos->filter(function($loan) {
+        return $loan->payments->where('paid', 1)->sum('amount') >= $loan->total_to_pay;
+    })->sortBy(fn($loan) => $loan->client->name)->values();
+
+    $pendientesList = $prestamos->filter(function($loan) {
+        return $loan->payments->where('paid', 1)->sum('amount') < $loan->total_to_pay;
+    })->sortBy(fn($loan) => $loan->client->name)->values();
+@endphp
+
+<!-- ================= DETALLE ================= -->
 <table>
     <thead>
         <tr>
@@ -58,27 +75,13 @@
     </thead>
     <tbody>
 
-        @php
-            // Separar por estado
-            $pagadosList = $prestamos->filter(function($loan) {
-                return $loan->payments->where('paid', 1)->sum('amount') >= $loan->total_to_pay;
-            })->sortBy(function($loan) {
-                return $loan->client->name;
-            });
-
-            $pendientesList = $prestamos->filter(function($loan) {
-                return $loan->payments->where('paid', 1)->sum('amount') < $loan->total_to_pay;
-            })->sortBy(function($loan) {
-                return $loan->client->name;
-            });
-        @endphp
-
-        <!-- PRÉSTAMOS PAGADOS -->
+    {{-- ================= PRÉSTAMOS PAGADOS ================= --}}
+    @if($estado === 'ambos' || $estado === 'pagado')
         <tr>
             <td colspan="9" class="titulo-seccion">PRÉSTAMOS PAGADOS</td>
         </tr>
 
-        @foreach($pagadosList->values() as $i => $loan)
+        @forelse($pagadosList as $i => $loan)
             @php
                 $pagado = $loan->payments->where('paid', 1)->sum('amount');
             @endphp
@@ -93,20 +96,20 @@
                 <td>{{ $loan->created_at->format('d/m/Y') }}</td>
                 <td>PAGADO</td>
             </tr>
-        @endforeach
-
-        @if($pagadosList->count() == 0)
+        @empty
             <tr>
                 <td colspan="9">No hay préstamos pagados</td>
             </tr>
-        @endif
+        @endforelse
+    @endif
 
-        <!-- PRÉSTAMOS PENDIENTES -->
+    {{-- ================= PRÉSTAMOS PENDIENTES ================= --}}
+    @if($estado === 'ambos' || $estado === 'pendiente')
         <tr>
             <td colspan="9" class="titulo-seccion">PRÉSTAMOS PENDIENTES</td>
         </tr>
 
-        @foreach($pendientesList->values() as $i => $loan)
+        @forelse($pendientesList as $i => $loan)
             @php
                 $pagado = $loan->payments->where('paid', 1)->sum('amount');
                 $saldo = $loan->total_to_pay - $pagado;
@@ -122,13 +125,12 @@
                 <td>{{ $loan->created_at->format('d/m/Y') }}</td>
                 <td>PENDIENTE</td>
             </tr>
-        @endforeach
-
-        @if($pendientesList->count() == 0)
+        @empty
             <tr>
                 <td colspan="9">No hay préstamos pendientes</td>
             </tr>
-        @endif
+        @endforelse
+    @endif
 
     </tbody>
 </table>

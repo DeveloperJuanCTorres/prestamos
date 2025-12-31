@@ -48,9 +48,12 @@
 
             <ul id="menuReportes" class="collapse">
                 <li class="py-2">
-                    <a href="{{ route('reporte.general') }}" target="_blank" class="btn btn-info text-white">
+                    <!-- <a href="{{ route('reporte.general') }}" target="_blank" class="btn btn-info text-white">
                         Reporte General
-                    </a>
+                    </a> -->
+                    <button type="button" id="btnReporteGeneral" class="btn btn-info text-white">
+                        Reporte General
+                    </button>
                 </li>
                 <li class="py-2">
                     <a href="{{ route('reporte.clientes') }}" target="_blank" class="btn btn-info text-white">
@@ -73,3 +76,7 @@
     </ul>        
 </div>
 <!--End sidebar-wrapper-->
+
+
+   
+
