@@ -296,7 +296,7 @@
                                 <input type="radio" name="estado" value="pagado">
                                 Solo Pagados
                             </label><br>
-                            <label class="text-insecondaryfo">
+                            <label class="text-secondary">
                                 <input type="radio" name="estado" value="pendiente">
                                 Solo Pendientes
                             </label>
