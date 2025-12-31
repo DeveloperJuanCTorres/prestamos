@@ -423,7 +423,7 @@ class LoanController extends Controller
             'pendientes'
         ));
 
-        return $pdf->stream('reporte_general_prestamos.pdf');
+        return $pdf->stream('reporte_general_prestamos'. time() . '.pdf');
     }
 
     public function reporteClientes()
