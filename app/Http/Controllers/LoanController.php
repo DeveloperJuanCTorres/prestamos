@@ -235,11 +235,21 @@ class LoanController extends Controller
             $amount = round((float)$request->amount, 2);
 
             // Cálculo de interés simple
-            $interestAmount = round($amount * ($interestPercent / 100), 2);
-            $totalToPay = round($amount + $interestAmount, 2);
+            // $interestAmount = round($amount * ($interestPercent / 100), 2);
+            // $totalToPay = round($amount + $interestAmount, 2);
 
             $numPayments = (int) $type->num_payments;
             $periodDays  = (int) $type->periodicity_days;
+
+            // 🔥 Interés mensual (solo si es 30 días)
+            if ($periodDays == 30) {
+                // interés por cuota
+                $interestAmount = round($amount * ($interestPercent / 100) * $numPayments, 2);
+            } else {
+                // interés simple normal
+                $interestAmount = round($amount * ($interestPercent / 100), 2);
+            }
+            $totalToPay = round($amount + $interestAmount, 2);
 
             if ($numPayments <= 0) {
                 throw new \Exception('El tipo seleccionado no tiene número de cuotas válido.');
