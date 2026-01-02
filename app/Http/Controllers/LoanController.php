@@ -116,11 +116,22 @@ class LoanController extends Controller
             $amount = round((float)$request->amount, 2);
 
             // Cálculo de interés simple
-            $interestAmount = round($amount * ($interestPercent / 100), 2);
-            $totalToPay = round($amount + $interestAmount, 2);
+            // $interestAmount = round($amount * ($interestPercent / 100), 2);
+            // $totalToPay = round($amount + $interestAmount, 2);
 
             $numPayments = $type->num_payments;
             $periodDays = $type->periodicity_days;
+
+            // 🔥 Interés mensual (solo si es 30 días)
+            if ($periodDays == 30) {
+                // interés por cuota
+                $interestAmount = round($amount * ($interestPercent / 100) * $numPayments, 2);
+            } else {
+                // interés simple normal
+                $interestAmount = round($amount * ($interestPercent / 100), 2);
+            }
+
+            $totalToPay = round($amount + $interestAmount, 2);
 
             // Crear préstamo
             $loan = Loan::create([
