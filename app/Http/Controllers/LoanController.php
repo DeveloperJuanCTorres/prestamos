@@ -321,112 +321,237 @@ class LoanController extends Controller
         return view('loans.edit', compact('loan','types'));
     }
 
+    // public function update(Request $request, Loan $loan)
+    // {
+    //     if ($loan->hasAnyPaidPayment()) {
+    //         return back()->with('error', 'No se puede modificar un préstamo con cuotas pagadas.');
+    //     }
+
+    //     $request->validate([
+    //         'amount' => 'required|numeric|min:1',
+    //         'type_id' => 'required|exists:types,id',
+    //         'interest_percent' => 'required|numeric',
+    //     ]);
+
+    //     $type = Type::findOrFail($request->type_id);
+
+    //     // validar rango de interés según tipo (server-side)
+    //     $min = (float)$type->minimo;
+    //     $max = (float)$type->maximo;
+    //     $interestPercent = (float)$request->interest_percent;
+
+    //     if ($interestPercent < $min || $interestPercent > $max) {
+    //         return back()
+    //             ->withInput()
+    //             ->withErrors(['interest_percent' => "El % de interés debe estar entre {$min}% y {$max}% para el tipo {$type->name}."]);
+    //     }
+
+    //     DB::beginTransaction();
+
+    //     try {
+    //         $amount = round((float)$request->amount, 2);
+
+    //         // Cálculo de interés simple
+    //         // $interestAmount = round($amount * ($interestPercent / 100), 2);
+    //         // $totalToPay = round($amount + $interestAmount, 2);
+
+    //         $numPayments = (int) $type->num_payments;
+    //         $periodDays  = (int) $type->periodicity_days;
+
+    //         // 🔥 Interés mensual (solo si es 30 días)
+    //         if ($periodDays == 30) {
+    //             // interés por cuota
+    //             $interestAmount = round($amount * ($interestPercent / 100) * $numPayments, 2);
+    //         } else {
+    //             // interés simple normal
+    //             $interestAmount = round($amount * ($interestPercent / 100), 2);
+    //         }
+    //         $totalToPay = round($amount + $interestAmount, 2);
+
+    //         if ($numPayments <= 0) {
+    //             throw new \Exception('El tipo seleccionado no tiene número de cuotas válido.');
+    //         }
+
+    //         // ✅ ACTUALIZAR PRÉSTAMO
+    //         $loan->update([
+    //             'type_id'        => $request->type_id,
+    //             'amount'         => $amount,
+    //             'interest_percent'=> $interestPercent,
+    //             'interest_amount'=> $interestAmount,
+    //             'total_to_pay'   => $totalToPay,
+    //             'num_payments'   => $numPayments,
+    //         ]);
+
+    //         // ✅ ELIMINAR CUOTAS ANTIGUAS
+    //         $loan->payments()->delete();
+
+    //         // ✅ CALCULAR CUOTAS NUEVAS (MISMA LÓGICA DEL STORE)
+    //         $basePayment = ceil(($totalToPay * 100 / $numPayments) / 10) / 10;
+
+    //         $payments = [];
+    //         $currentDate = Carbon::now()->addDays($periodDays);
+    //         $accumulated = 0;
+
+    //         for ($i = 1; $i <= $numPayments; $i++) {
+    //             if ($i < $numPayments) {
+    //                 $amt = $basePayment;
+    //                 $accumulated += $amt;
+    //             } else {
+    //                 $amt = round($totalToPay - $accumulated, 2);
+    //             }
+
+    //             $payments[] = [
+    //                 'loan_id'    => $loan->id,
+    //                 'due_date'   => $currentDate->toDateString(),
+    //                 'amount'     => $amt,
+    //                 'paid'       => 0,
+    //                 'cuota'      => $i,
+    //                 'created_at'=> now(),
+    //                 'updated_at'=> now(),
+    //             ];
+
+    //             $currentDate = $currentDate->copy()->addDays($periodDays);
+    //         }
+
+    //         // ✅ INSERTAR NUEVAS CUOTAS
+    //         LoanPayment::insert($payments);
+
+    //         DB::commit();
+
+    //         return redirect()->route('loans.show', $loan->id)
+    //             ->with('success', 'Préstamo actualizado y cronograma regenerado correctamente.');
+
+    //     } catch (\Throwable $e) {
+    //         DB::rollBack();
+    //         return back()->withInput()
+    //             ->withErrors(['error' => 'Error al actualizar préstamo: ' . $e->getMessage()]);
+    //     }
+    // }
+
     public function update(Request $request, Loan $loan)
     {
+        // ❌ No permitir modificar si hay cuotas pagadas
         if ($loan->hasAnyPaidPayment()) {
             return back()->with('error', 'No se puede modificar un préstamo con cuotas pagadas.');
         }
 
+        // Validaciones
         $request->validate([
-            'amount' => 'required|numeric|min:1',
-            'type_id' => 'required|exists:types,id',
+            'amount'           => 'required|numeric|min:1',
+            'type_id'          => 'required|exists:types,id',
             'interest_percent' => 'required|numeric',
         ]);
 
         $type = Type::findOrFail($request->type_id);
 
-        // validar rango de interés según tipo (server-side)
-        $min = (float)$type->minimo;
-        $max = (float)$type->maximo;
-        $interestPercent = (float)$request->interest_percent;
+        // Validar rango de interés según tipo
+        $min = (float) $type->minimo;
+        $max = (float) $type->maximo;
+        $interestPercent = (float) $request->interest_percent;
 
         if ($interestPercent < $min || $interestPercent > $max) {
             return back()
                 ->withInput()
-                ->withErrors(['interest_percent' => "El % de interés debe estar entre {$min}% y {$max}% para el tipo {$type->name}."]);
+                ->withErrors([
+                    'interest_percent' =>
+                        "El % de interés debe estar entre {$min}% y {$max}% para el tipo {$type->name}."
+                ]);
         }
 
         DB::beginTransaction();
 
         try {
-            $amount = round((float)$request->amount, 2);
-
-            // Cálculo de interés simple
-            // $interestAmount = round($amount * ($interestPercent / 100), 2);
-            // $totalToPay = round($amount + $interestAmount, 2);
+            $amount = round((float) $request->amount, 2);
 
             $numPayments = (int) $type->num_payments;
             $periodDays  = (int) $type->periodicity_days;
 
-            // 🔥 Interés mensual (solo si es 30 días)
-            if ($periodDays == 30) {
-                // interés por cuota
-                $interestAmount = round($amount * ($interestPercent / 100) * $numPayments, 2);
-            } else {
-                // interés simple normal
-                $interestAmount = round($amount * ($interestPercent / 100), 2);
+            if ($numPayments <= 0 || $periodDays <= 0) {
+                throw new \Exception('El tipo seleccionado no tiene configuración válida.');
             }
-            $totalToPay = round($amount + $interestAmount, 2);
 
-            if ($numPayments <= 0) {
-                throw new \Exception('El tipo seleccionado no tiene número de cuotas válido.');
-            }
+            /*
+            |--------------------------------------------------------------------------
+            | 🔥 CÁLCULO CORRECTO DEL INTERÉS MENSUAL
+            |--------------------------------------------------------------------------
+            */
+            $totalDays = $numPayments * $periodDays;
+            $months    = ceil($totalDays / 30);
+
+            $interestAmount = round(
+                $amount * ($interestPercent / 100) * $months,
+                2
+            );
+
+            $totalToPay = round($amount + $interestAmount, 2);
 
             // ✅ ACTUALIZAR PRÉSTAMO
             $loan->update([
-                'type_id'        => $request->type_id,
-                'amount'         => $amount,
-                'interest_percent'=> $interestPercent,
-                'interest_amount'=> $interestAmount,
-                'total_to_pay'   => $totalToPay,
-                'num_payments'   => $numPayments,
+                'type_id'          => $request->type_id,
+                'amount'           => $amount,
+                'interest_percent' => $interestPercent,
+                'interest_amount'  => $interestAmount,
+                'total_to_pay'     => $totalToPay,
+                'num_payments'     => $numPayments,
             ]);
 
             // ✅ ELIMINAR CUOTAS ANTIGUAS
             $loan->payments()->delete();
 
-            // ✅ CALCULAR CUOTAS NUEVAS (MISMA LÓGICA DEL STORE)
+            /*
+            |--------------------------------------------------------------------------
+            | GENERAR NUEVO CRONOGRAMA DE PAGOS
+            |--------------------------------------------------------------------------
+            */
             $basePayment = ceil(($totalToPay * 100 / $numPayments) / 10) / 10;
 
-            $payments = [];
+            $payments    = [];
             $currentDate = Carbon::now()->addDays($periodDays);
             $accumulated = 0;
 
             for ($i = 1; $i <= $numPayments; $i++) {
+
                 if ($i < $numPayments) {
-                    $amt = $basePayment;
-                    $accumulated += $amt;
+                    $paymentAmount = $basePayment;
+                    $accumulated += $paymentAmount;
                 } else {
-                    $amt = round($totalToPay - $accumulated, 2);
+                    // Última cuota ajusta exacto
+                    $paymentAmount = round($totalToPay - $accumulated, 2);
                 }
 
                 $payments[] = [
                     'loan_id'    => $loan->id,
-                    'due_date'   => $currentDate->toDateString(),
-                    'amount'     => $amt,
-                    'paid'       => 0,
                     'cuota'      => $i,
-                    'created_at'=> now(),
-                    'updated_at'=> now(),
+                    'due_date'   => $currentDate->toDateString(),
+                    'amount'     => $paymentAmount,
+                    'paid'       => 0,
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ];
 
                 $currentDate = $currentDate->copy()->addDays($periodDays);
             }
 
-            // ✅ INSERTAR NUEVAS CUOTAS
+            // Insertar nuevas cuotas
             LoanPayment::insert($payments);
 
             DB::commit();
 
-            return redirect()->route('loans.show', $loan->id)
+            return redirect()
+                ->route('loans.show', $loan->id)
                 ->with('success', 'Préstamo actualizado y cronograma regenerado correctamente.');
 
         } catch (\Throwable $e) {
             DB::rollBack();
-            return back()->withInput()
-                ->withErrors(['error' => 'Error al actualizar préstamo: ' . $e->getMessage()]);
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'error' => 'Error al actualizar préstamo: ' . $e->getMessage()
+                ]);
         }
     }
+
 
 
     public function pay($id)
