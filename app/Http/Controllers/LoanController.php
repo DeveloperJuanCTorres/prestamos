@@ -88,103 +88,220 @@ class LoanController extends Controller
     }
 
     // Guardar préstamo y generar cronograma
+    // public function store(Request $request)
+    // {
+    //     // Validar existencia del tipo antes de usar sus límites
+    //     $request->validate([
+    //         'client_id' => 'required|exists:clients,id',
+    //         'amount' => 'required|numeric|min:1',
+    //         'type_id' => 'required|exists:types,id',
+    //         'interest_percent' => 'required|numeric',
+    //     ]);
+
+    //     $type = Type::findOrFail($request->type_id);
+
+    //     // validar rango de interés según tipo (server-side)
+    //     $min = (float)$type->minimo;
+    //     $max = (float)$type->maximo;
+    //     $interestPercent = (float)$request->interest_percent;
+
+    //     if ($interestPercent < $min || $interestPercent > $max) {
+    //         return back()
+    //             ->withInput()
+    //             ->withErrors(['interest_percent' => "El % de interés debe estar entre {$min}% y {$max}% para el tipo {$type->name}."]);
+    //     }
+
+    //     DB::beginTransaction();
+    //     try {
+    //         $amount = round((float)$request->amount, 2);
+
+    //         // Cálculo de interés simple
+    //         // $interestAmount = round($amount * ($interestPercent / 100), 2);
+    //         // $totalToPay = round($amount + $interestAmount, 2);
+
+    //         $numPayments = $type->num_payments;
+    //         $periodDays = $type->periodicity_days;
+
+    //         // 🔥 Interés mensual (solo si es 30 días)
+    //         if ($periodDays == 30) {
+    //             // interés por cuota
+    //             $interestAmount = round($amount * ($interestPercent / 100) * $numPayments, 2);
+    //         } else {
+    //             // interés simple normal
+    //             $interestAmount = round($amount * ($interestPercent / 100), 2);
+    //         }
+
+    //         $totalToPay = round($amount + $interestAmount, 2);
+
+    //         // Crear préstamo
+    //         $loan = Loan::create([
+    //             'client_id' => $request->client_id,
+    //             'type_id' => $request->type_id,
+    //             'amount' => $amount,
+    //             'interest_percent' => $interestPercent,
+    //             'interest_amount' => $interestAmount,
+    //             'total_to_pay' => $totalToPay,
+    //             'num_payments' => $numPayments,
+    //         ]);
+
+    //         // Calcular cuota base redondeada al décimo superior
+    //         $basePayment = ceil(($totalToPay * 100 / $numPayments) / 10) / 10;
+
+    //         $payments = [];
+    //         $currentDate = Carbon::now()->addDays($periodDays);
+    //         $accumulated = 0;
+
+    //         for ($i = 1; $i <= $numPayments; $i++) {
+    //             if ($i < $numPayments) {
+    //                 $amt = $basePayment;
+    //                 $accumulated += $amt;
+    //             } else {
+    //                 // Última cuota ajusta exacto el total
+    //                 $amt = round($totalToPay - $accumulated, 2);
+    //             }
+
+    //             $payments[] = [
+    //                 'loan_id'    => $loan->id,
+    //                 'due_date'   => $currentDate->toDateString(),
+    //                 'amount'     => $amt,
+    //                 'created_at' => now(),
+    //                 'updated_at' => now(),
+    //                 'cuota'      => $i
+    //             ];
+
+    //             $currentDate = $currentDate->copy()->addDays($periodDays);
+    //         }
+
+    //         // Insertar todas las cuotas
+    //         LoanPayment::insert($payments);
+
+    //         DB::commit();
+
+    //         return redirect()->route('loans.show', $loan->id)
+    //             ->with('success', 'Préstamo creado y cronograma generado correctamente.');
+
+    //     } catch (\Throwable $e) {
+    //         DB::rollBack();
+    //         return back()->withInput()->withErrors(['error' => 'Error al crear préstamo: ' . $e->getMessage()]);
+    //     }
+    // }    
+
     public function store(Request $request)
     {
-        // Validar existencia del tipo antes de usar sus límites
+        // Validaciones
         $request->validate([
-            'client_id' => 'required|exists:clients,id',
-            'amount' => 'required|numeric|min:1',
-            'type_id' => 'required|exists:types,id',
+            'client_id'        => 'required|exists:clients,id',
+            'amount'           => 'required|numeric|min:1',
+            'type_id'          => 'required|exists:types,id',
             'interest_percent' => 'required|numeric',
         ]);
 
         $type = Type::findOrFail($request->type_id);
 
-        // validar rango de interés según tipo (server-side)
-        $min = (float)$type->minimo;
-        $max = (float)$type->maximo;
-        $interestPercent = (float)$request->interest_percent;
+        // Validar rango de interés según tipo
+        $min = (float) $type->minimo;
+        $max = (float) $type->maximo;
+        $interestPercent = (float) $request->interest_percent;
 
         if ($interestPercent < $min || $interestPercent > $max) {
             return back()
                 ->withInput()
-                ->withErrors(['interest_percent' => "El % de interés debe estar entre {$min}% y {$max}% para el tipo {$type->name}."]);
+                ->withErrors([
+                    'interest_percent' => "El % de interés debe estar entre {$min}% y {$max}% para el tipo {$type->name}."
+                ]);
         }
 
         DB::beginTransaction();
+
         try {
-            $amount = round((float)$request->amount, 2);
+            $amount = round((float) $request->amount, 2);
 
-            // Cálculo de interés simple
-            // $interestAmount = round($amount * ($interestPercent / 100), 2);
-            // $totalToPay = round($amount + $interestAmount, 2);
+            $numPayments = (int) $type->num_payments;
+            $periodDays  = (int) $type->periodicity_days;
 
-            $numPayments = $type->num_payments;
-            $periodDays = $type->periodicity_days;
+            /*
+            |--------------------------------------------------------------------------
+            | 🔥 CÁLCULO CORRECTO DEL INTERÉS MENSUAL
+            |--------------------------------------------------------------------------
+            | Se calcula cuántos días dura el préstamo
+            | Luego se convierte a meses (30 días = 1 mes)
+            | Se cobra interés mensual por cada mes completo
+            */
+            $totalDays = $numPayments * $periodDays;
+            $months    = ceil($totalDays / 30);
 
-            // 🔥 Interés mensual (solo si es 30 días)
-            if ($periodDays == 30) {
-                // interés por cuota
-                $interestAmount = round($amount * ($interestPercent / 100) * $numPayments, 2);
-            } else {
-                // interés simple normal
-                $interestAmount = round($amount * ($interestPercent / 100), 2);
-            }
+            $interestAmount = round(
+                $amount * ($interestPercent / 100) * $months,
+                2
+            );
 
             $totalToPay = round($amount + $interestAmount, 2);
 
             // Crear préstamo
             $loan = Loan::create([
-                'client_id' => $request->client_id,
-                'type_id' => $request->type_id,
-                'amount' => $amount,
+                'client_id'        => $request->client_id,
+                'type_id'          => $request->type_id,
+                'amount'           => $amount,
                 'interest_percent' => $interestPercent,
-                'interest_amount' => $interestAmount,
-                'total_to_pay' => $totalToPay,
-                'num_payments' => $numPayments,
+                'interest_amount'  => $interestAmount,
+                'total_to_pay'     => $totalToPay,
+                'num_payments'     => $numPayments,
             ]);
 
-            // Calcular cuota base redondeada al décimo superior
+            /*
+            |--------------------------------------------------------------------------
+            | GENERAR CRONOGRAMA DE PAGOS
+            |--------------------------------------------------------------------------
+            */
+            // Cuota base redondeada al décimo superior
             $basePayment = ceil(($totalToPay * 100 / $numPayments) / 10) / 10;
 
-            $payments = [];
-            $currentDate = Carbon::now()->addDays($periodDays);
-            $accumulated = 0;
+            $payments     = [];
+            $currentDate  = Carbon::now()->addDays($periodDays);
+            $accumulated  = 0;
 
             for ($i = 1; $i <= $numPayments; $i++) {
+
                 if ($i < $numPayments) {
-                    $amt = $basePayment;
-                    $accumulated += $amt;
+                    $amountPayment = $basePayment;
+                    $accumulated += $amountPayment;
                 } else {
-                    // Última cuota ajusta exacto el total
-                    $amt = round($totalToPay - $accumulated, 2);
+                    // Última cuota ajusta exacto
+                    $amountPayment = round($totalToPay - $accumulated, 2);
                 }
 
                 $payments[] = [
                     'loan_id'    => $loan->id,
+                    'cuota'      => $i,
                     'due_date'   => $currentDate->toDateString(),
-                    'amount'     => $amt,
+                    'amount'     => $amountPayment,
                     'created_at' => now(),
                     'updated_at' => now(),
-                    'cuota'      => $i
                 ];
 
                 $currentDate = $currentDate->copy()->addDays($periodDays);
             }
 
-            // Insertar todas las cuotas
+            // Insertar cuotas
             LoanPayment::insert($payments);
 
             DB::commit();
 
-            return redirect()->route('loans.show', $loan->id)
+            return redirect()
+                ->route('loans.show', $loan->id)
                 ->with('success', 'Préstamo creado y cronograma generado correctamente.');
 
         } catch (\Throwable $e) {
             DB::rollBack();
-            return back()->withInput()->withErrors(['error' => 'Error al crear préstamo: ' . $e->getMessage()]);
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'error' => 'Error al crear préstamo: ' . $e->getMessage()
+                ]);
         }
-    }    
+    }
+
 
     // Mostrar préstamo y cronograma
     public function show(Loan $loan)
