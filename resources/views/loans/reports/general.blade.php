@@ -20,6 +20,7 @@
 <body>
 
 <h2>REPORTE GENERAL DE PRÉSTAMOS</h2>
+
 <p>
     <strong>Fecha:</strong> {{ now()->format('d/m/Y') }} <br>
     <strong>Estado:</strong>
@@ -48,7 +49,6 @@
 </table>
 
 @php
-    // ================= SEPARAR Y ORDENAR =================
     $pagadosList = $prestamos->filter(function($loan) {
         return $loan->payments->where('paid', 1)->sum('amount') >= $loan->total_to_pay;
     })->sortBy(fn($loan) => $loan->client->name)->values();
@@ -65,12 +65,13 @@
             <th>#</th>
             <th>Cliente</th>
             <th>Monto</th>
-            <th>Interés</th>
+            <!-- <th>Interés</th> -->
             <th>Total</th>
             <th>Pagado</th>
             <th>Saldo</th>
             <th>Fecha</th>
-            <th>Estado</th>
+            <th>Tipo</th>
+            <th>Cuota</th>
         </tr>
     </thead>
     <tbody>
@@ -84,17 +85,20 @@
         @forelse($pagadosList as $i => $loan)
             @php
                 $pagado = $loan->payments->where('paid', 1)->sum('amount');
+                $cuotasPagadas = $loan->payments->where('paid', 1)->count();
+                $totalCuotas = $loan->num_payments;
             @endphp
             <tr>
                 <td>{{ $i + 1 }}</td>
                 <td>{{ $loan->client->name }}</td>
                 <td>S/ {{ number_format($loan->amount, 2) }}</td>
-                <td>{{ $loan->interest_percent }} %</td>
+                <!-- <td>{{ $loan->interest_percent }} %</td> -->
                 <td>S/ {{ number_format($loan->total_to_pay, 2) }}</td>
                 <td>S/ {{ number_format($pagado, 2) }}</td>
                 <td>S/ 0.00</td>
                 <td>{{ $loan->created_at->format('d/m/Y') }}</td>
-                <td>PAGADO</td>
+                <td>{{ $loan->type->name }}</td>
+                <td>{{ $cuotasPagadas }}/{{ $totalCuotas }}</td>
             </tr>
         @empty
             <tr>
@@ -113,17 +117,20 @@
             @php
                 $pagado = $loan->payments->where('paid', 1)->sum('amount');
                 $saldo = $loan->total_to_pay - $pagado;
+                $cuotasPagadas = $loan->payments->where('paid', 1)->count();
+                $totalCuotas = $loan->num_payments;
             @endphp
             <tr>
                 <td>{{ $i + 1 }}</td>
                 <td>{{ $loan->client->name }}</td>
                 <td>S/ {{ number_format($loan->amount, 2) }}</td>
-                <td>{{ $loan->interest_percent }} %</td>
+                <!-- <td>{{ $loan->interest_percent }} %</td> -->
                 <td>S/ {{ number_format($loan->total_to_pay, 2) }}</td>
                 <td>S/ {{ number_format($pagado, 2) }}</td>
                 <td>S/ {{ number_format($saldo, 2) }}</td>
                 <td>{{ $loan->created_at->format('d/m/Y') }}</td>
-                <td>PENDIENTE</td>
+                <td>{{ $loan->type->name }}</td>
+                <td>{{ $cuotasPagadas }}/{{ $totalCuotas }}</td>
             </tr>
         @empty
             <tr>

@@ -693,7 +693,7 @@ class LoanController extends Controller
     {
         $estado = $request->get('estado', 'ambos'); // pagado | pendiente | ambos
 
-        $prestamos = Loan::with(['client', 'payments'])->get();
+        $prestamos = Loan::with(['client', 'payments', 'type'])->get();
 
         // Filtrar según estado
         if ($estado === 'pagado') {
