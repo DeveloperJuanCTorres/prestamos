@@ -711,30 +711,27 @@ class LoanController extends Controller
 
     public function reporteGeneral(Request $request)
     {
-        $estado = $request->get('estado', 'ambos'); // pagado | pendiente | ambos
+        $estado = $request->get('estado', 'ambos');
 
-        // Cargar todos los préstamos
         $prestamos = Loan::with(['client', 'payments', 'type'])->get();
 
-        // Calcular saldo real por préstamo
+        // Calcular pagado y saldo REAL
         $prestamos = $prestamos->map(function ($loan) {
-            $pagado = $loan->payments->where('paid', 1)->sum('amount');
+            $pagado = $loan->payments->sum('amount'); // 👈 SIN paid
+
             $loan->pagado_total = $pagado;
             $loan->saldo = $loan->total_to_pay - $pagado;
+
             return $loan;
         });
 
-        // Filtrar según estado usando saldo
+        // Filtrar por estado
         if ($estado === 'pagado') {
-            $prestamos = $prestamos->filter(function ($loan) {
-                return $loan->saldo == 0;
-            });
+            $prestamos = $prestamos->filter(fn ($loan) => $loan->saldo <= 0);
         }
 
         if ($estado === 'pendiente') {
-            $prestamos = $prestamos->filter(function ($loan) {
-                return $loan->saldo > 0;
-            });
+            $prestamos = $prestamos->filter(fn ($loan) => $loan->saldo > 0);
         }
 
         // Totales
@@ -742,8 +739,7 @@ class LoanController extends Controller
         $totalPagado = $prestamos->sum('pagado_total');
         $totalPorCobrar = $prestamos->sum('saldo');
 
-        // Conteos (correctos)
-        $pagados = $prestamos->where('saldo', 0)->count();
+        $pagados = $prestamos->where('saldo', '<=', 0)->count();
         $pendientes = $prestamos->where('saldo', '>', 0)->count();
 
         $pdf = Pdf::loadView('loans.reports.general', compact(
