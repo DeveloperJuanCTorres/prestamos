@@ -49,12 +49,15 @@
 </table>
 
 @php
+    // 👇 CLASIFICACIÓN CORRECTA POR SALDO REAL
     $pagadosList = $prestamos->filter(function($loan) {
-        return $loan->payments->where('paid', 1)->sum('amount') >= $loan->total_to_pay;
+        $pagado = $loan->payments->sum('amount');
+        return ($loan->total_to_pay - $pagado) <= 0;
     })->sortBy(fn($loan) => $loan->client->name)->values();
 
     $pendientesList = $prestamos->filter(function($loan) {
-        return $loan->payments->where('paid', 1)->sum('amount') < $loan->total_to_pay;
+        $pagado = $loan->payments->sum('amount');
+        return ($loan->total_to_pay - $pagado) > 0;
     })->sortBy(fn($loan) => $loan->client->name)->values();
 @endphp
 
@@ -65,7 +68,6 @@
             <th>#</th>
             <th>Cliente</th>
             <th>Monto</th>
-            <!-- <th>Interés</th> -->
             <th>Total</th>
             <th>Pagado</th>
             <th>Saldo</th>
@@ -84,15 +86,14 @@
 
         @forelse($pagadosList as $i => $loan)
             @php
-                $pagado = $loan->payments->where('paid', 1)->sum('amount');
-                $cuotasPagadas = $loan->payments->where('paid', 1)->count();
+                $pagado = $loan->payments->sum('amount');
+                $cuotasPagadas = $loan->payments->count();
                 $totalCuotas = $loan->num_payments;
             @endphp
             <tr>
                 <td>{{ $i + 1 }}</td>
                 <td>{{ $loan->client->name }}</td>
                 <td>S/ {{ number_format($loan->amount, 2) }}</td>
-                <!-- <td>{{ $loan->interest_percent }} %</td> -->
                 <td>S/ {{ number_format($loan->total_to_pay, 2) }}</td>
                 <td>S/ {{ number_format($pagado, 2) }}</td>
                 <td>S/ 0.00</td>
@@ -115,16 +116,15 @@
 
         @forelse($pendientesList as $i => $loan)
             @php
-                $pagado = $loan->payments->where('paid', 1)->sum('amount');
+                $pagado = $loan->payments->sum('amount');
                 $saldo = $loan->total_to_pay - $pagado;
-                $cuotasPagadas = $loan->payments->where('paid', 1)->count();
+                $cuotasPagadas = $loan->payments->count();
                 $totalCuotas = $loan->num_payments;
             @endphp
             <tr>
                 <td>{{ $i + 1 }}</td>
                 <td>{{ $loan->client->name }}</td>
                 <td>S/ {{ number_format($loan->amount, 2) }}</td>
-                <!-- <td>{{ $loan->interest_percent }} %</td> -->
                 <td>S/ {{ number_format($loan->total_to_pay, 2) }}</td>
                 <td>S/ {{ number_format($pagado, 2) }}</td>
                 <td>S/ {{ number_format($saldo, 2) }}</td>
