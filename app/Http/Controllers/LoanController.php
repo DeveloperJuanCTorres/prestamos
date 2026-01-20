@@ -715,9 +715,9 @@ class LoanController extends Controller
 
         $prestamos = Loan::with(['client', 'payments', 'type'])->get();
 
-        // Calcular pagado y saldo REAL
+        // Calcular pagado y saldo UNA SOLA VEZ
         $prestamos = $prestamos->map(function ($loan) {
-            $pagado = $loan->payments->sum('amount'); // 👈 SIN paid
+            $pagado = $loan->payments->sum('amount'); // SIN paid
 
             $loan->pagado_total = $pagado;
             $loan->saldo = $loan->total_to_pay - $pagado;
@@ -725,13 +725,15 @@ class LoanController extends Controller
             return $loan;
         });
 
-        // Filtrar por estado
-        if ($estado === 'pagado') {
-            $prestamos = $prestamos->filter(fn ($loan) => $loan->saldo <= 0);
-        }
+        // Listas
+        $pagadosList = $prestamos->filter(fn($l) => $l->saldo <= 0)->values();
+        $pendientesList = $prestamos->filter(fn($l) => $l->saldo > 0)->values();
 
-        if ($estado === 'pendiente') {
-            $prestamos = $prestamos->filter(fn ($loan) => $loan->saldo > 0);
+        // Aplicar filtro visual
+        if ($estado === 'pagado') {
+            $prestamos = $pagadosList;
+        } elseif ($estado === 'pendiente') {
+            $prestamos = $pendientesList;
         }
 
         // Totales
@@ -739,11 +741,13 @@ class LoanController extends Controller
         $totalPagado = $prestamos->sum('pagado_total');
         $totalPorCobrar = $prestamos->sum('saldo');
 
-        $pagados = $prestamos->where('saldo', '<=', 0)->count();
-        $pendientes = $prestamos->where('saldo', '>', 0)->count();
+        $pagados = $pagadosList->count();
+        $pendientes = $pendientesList->count();
 
         $pdf = Pdf::loadView('loans.reports.general', compact(
             'prestamos',
+            'pagadosList',
+            'pendientesList',
             'totalPrestado',
             'totalPagado',
             'totalPorCobrar',
@@ -757,6 +761,7 @@ class LoanController extends Controller
         );
     }
 
+    
 
 
     public function reporteClientes()
