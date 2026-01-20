@@ -48,16 +48,6 @@
     </tr>
 </table>
 
-@php
-    $pagadosList = $prestamos->filter(function($loan) {
-        return $loan->payments->where('paid', 1)->sum('amount') >= $loan->total_to_pay;
-    });
-
-    $pendientesList = $prestamos->filter(function($loan) {
-        return $loan->payments->where('paid', 1)->sum('amount') < $loan->total_to_pay;
-    });
-@endphp
-
 <!-- ================= DETALLE ================= -->
 <table>
     <thead>
@@ -65,7 +55,6 @@
             <th>#</th>
             <th>Cliente</th>
             <th>Monto</th>
-            <!-- <th>Interés</th> -->
             <th>Total</th>
             <th>Pagado</th>
             <th>Saldo</th>
@@ -82,23 +71,23 @@
             <td colspan="9" class="titulo-seccion">PRÉSTAMOS PAGADOS</td>
         </tr>
 
-        @foreach($pagadosList as $i => $loan)
-        <tr>
-            <td>{{ $i + 1 }}</td>
-            <td>{{ $loan->client->name }}</td>
-            <td>S/ {{ number_format($loan->amount, 2) }}</td>
-            <td>S/ {{ number_format($loan->total_to_pay, 2) }}</td>
-            <td>S/ {{ number_format($loan->pagado_total, 2) }}</td>
-            <td>S/ 0.00</td>
-            <td>{{ $loan->created_at->format('d/m/Y') }}</td>
-            <td>{{ $loan->type->name }}</td>
-            <td>{{ $loan->payments->count() }}/{{ $loan->num_payments }}</td>
-        </tr>
+        @forelse($pagadosList as $i => $loan)
+            <tr>
+                <td>{{ $i + 1 }}</td>
+                <td>{{ $loan->client->name }}</td>
+                <td>S/ {{ number_format($loan->amount, 2) }}</td>
+                <td>S/ {{ number_format($loan->total_to_pay, 2) }}</td>
+                <td>S/ {{ number_format($loan->pagado_total, 2) }}</td>
+                <td>S/ 0.00</td>
+                <td>{{ $loan->created_at->format('d/m/Y') }}</td>
+                <td>{{ $loan->type->name }}</td>
+                <td>{{ $loan->payments->count() }}/{{ $loan->num_payments }}</td>
+            </tr>
         @empty
             <tr>
                 <td colspan="9">No hay préstamos pagados</td>
             </tr>
-        @endforeach
+        @endforelse
     @endif
 
     {{-- ================= PRÉSTAMOS PENDIENTES ================= --}}
@@ -107,7 +96,7 @@
             <td colspan="9" class="titulo-seccion">PRÉSTAMOS PENDIENTES</td>
         </tr>
 
-        @foreach($pendientesList as $i => $loan)
+        @forelse($pendientesList as $i => $loan)
             <tr>
                 <td>{{ $i + 1 }}</td>
                 <td>{{ $loan->client->name }}</td>
