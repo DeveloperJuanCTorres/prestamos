@@ -49,15 +49,14 @@
 </table>
 
 @php
-    // 👇 CLASIFICACIÓN CORRECTA POR SALDO REAL
     $pagadosList = $prestamos->filter(function($loan) {
-        $pagado = $loan->payments->sum('amount');
-        return ($loan->total_to_pay - $pagado) <= 0;
+        $cuotasPagadas = $loan->payments->where('paid', 1)->count();
+        return $cuotasPagadas == $loan->num_payments;
     })->sortBy(fn($loan) => $loan->client->name)->values();
 
     $pendientesList = $prestamos->filter(function($loan) {
-        $pagado = $loan->payments->sum('amount');
-        return ($loan->total_to_pay - $pagado) > 0;
+        $cuotasPagadas = $loan->payments->where('paid', 1)->count();
+        return $cuotasPagadas < $loan->num_payments;
     })->sortBy(fn($loan) => $loan->client->name)->values();
 @endphp
 
