@@ -654,18 +654,35 @@ class LoanController extends Controller
         ]);
     }
 
-    // public function reporteGeneral()
+    
+
+    // public function reporteGeneral(Request $request)
     // {
-    //     $prestamos = Loan::with(['client', 'payments'])->get();
+    //     $estado = $request->get('estado', 'ambos'); // pagado | pendiente | ambos
+
+    //     $prestamos = Loan::with(['client', 'payments', 'type'])->get();
+
+    //     // Filtrar según estado
+    //     if ($estado === 'pagado') {
+    //         $prestamos = $prestamos->filter(function ($loan) {
+    //             return $loan->payments->where('paid', 1)->sum('amount') >= $loan->total_to_pay;
+    //         });
+    //     }
+
+    //     if ($estado === 'pendiente') {
+    //         $prestamos = $prestamos->filter(function ($loan) {
+    //             return $loan->payments->where('paid', 1)->sum('amount') < $loan->total_to_pay;
+    //         });
+    //     }
 
     //     $totalPrestado = $prestamos->sum('amount');
+
     //     $totalPagado = $prestamos->sum(function ($loan) {
     //         return $loan->payments->where('paid', 1)->sum('amount');
     //     });
 
     //     $totalPorCobrar = $totalPrestado - $totalPagado;
 
-    //     // Conteo de estados
     //     $pagados = 0;
     //     $pendientes = 0;
 
@@ -683,10 +700,13 @@ class LoanController extends Controller
     //         'totalPagado',
     //         'totalPorCobrar',
     //         'pagados',
-    //         'pendientes'
+    //         'pendientes',
+    //         'estado'
     //     ));
 
-    //     return $pdf->download('reporte_general_prestamos'. time() . '.pdf');
+    //     return $pdf->stream(
+    //         'reporte_general_' . $estado . '_' . time() . '.pdf'
+    //     );
     // }
 
     public function reporteGeneral(Request $request)
@@ -698,33 +718,57 @@ class LoanController extends Controller
         // Filtrar según estado
         if ($estado === 'pagado') {
             $prestamos = $prestamos->filter(function ($loan) {
-                return $loan->payments->where('paid', 1)->sum('amount') >= $loan->total_to_pay;
+                $pagado = round(
+                    $loan->payments->where('paid', 1)->sum('amount'),
+                    2
+                );
+
+                $total = round($loan->total_to_pay, 2);
+
+                return $pagado >= $total;
             });
         }
 
         if ($estado === 'pendiente') {
             $prestamos = $prestamos->filter(function ($loan) {
-                return $loan->payments->where('paid', 1)->sum('amount') < $loan->total_to_pay;
+                $pagado = round(
+                    $loan->payments->where('paid', 1)->sum('amount'),
+                    2
+                );
+
+                $total = round($loan->total_to_pay, 2);
+
+                return $pagado < $total;
             });
         }
 
         $totalPrestado = $prestamos->sum('amount');
 
         $totalPagado = $prestamos->sum(function ($loan) {
-            return $loan->payments->where('paid', 1)->sum('amount');
+            return round(
+                $loan->payments->where('paid', 1)->sum('amount'),
+                2
+            );
         });
 
-        $totalPorCobrar = $totalPrestado - $totalPagado;
+        $totalPorCobrar = round($totalPrestado - $totalPagado, 2);
 
         $pagados = 0;
         $pendientes = 0;
 
         foreach ($prestamos as $loan) {
-            $pagado = $loan->payments->where('paid', 1)->sum('amount');
-            $saldo = $loan->total_to_pay - $pagado;
+            $pagado = round(
+                $loan->payments->where('paid', 1)->sum('amount'),
+                2
+            );
 
-            if ($saldo <= 0) $pagados++;
-            else $pendientes++;
+            $total = round($loan->total_to_pay, 2);
+
+            if ($pagado >= $total) {
+                $pagados++;
+            } else {
+                $pendientes++;
+            }
         }
 
         $pdf = Pdf::loadView('loans.reports.general', compact(
