@@ -41,7 +41,7 @@
     </tr>
     <tr>
         <td>Pagados</td>
-        <td>{{ $pagados }}</td>
+        <td>{{ $pagados }}1</td>
         <td>Pendientes</td>
         <td>{{ $pendientes }}</td>
         <td colspan="2"></td>
