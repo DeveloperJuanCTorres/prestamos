@@ -656,13 +656,89 @@ class LoanController extends Controller
 
     
 
+    // public function reporteGeneral(Request $request)
+    // {
+    //     $estado = $request->get('estado', 'ambos'); // pagado | pendiente | ambos
+
+    //     $prestamos = Loan::with(['client', 'payments', 'type'])->get();
+
+    //     // Filtrar según estado
+    //     if ($estado === 'pagado') {
+    //         $prestamos = $prestamos->filter(function ($loan) {
+    //             return $loan->payments->where('paid', 1)->sum('amount') >= $loan->total_to_pay;
+    //         });
+    //     }
+
+    //     if ($estado === 'pendiente') {
+    //         $prestamos = $prestamos->filter(function ($loan) {
+    //             return $loan->payments->where('paid', 1)->sum('amount') < $loan->total_to_pay;
+    //         });
+    //     }
+
+    //     $totalPrestado = $prestamos->sum('amount');
+
+    //     $totalPagado = $prestamos->sum(function ($loan) {
+    //         return $loan->payments->where('paid', 1)->sum('amount');
+    //     });
+
+    //     $totalPorCobrar = $totalPrestado - $totalPagado;
+
+
+    //     $pagados = $prestamos->filter(function ($loan) {
+    //         return $loan->payments->where('paid', 1)->sum('amount') >= $loan->total_to_pay;
+    //     })->count();
+
+    //     $pendientes = $prestamos->filter(function ($loan) {
+    //         return $loan->payments->where('paid', 1)->sum('amount') < $loan->total_to_pay;
+    //     })->count();
+
+    //     $pdf = Pdf::loadView('loans.reports.general', compact(
+    //         'prestamos',
+    //         'totalPrestado',
+    //         'totalPagado',
+    //         'totalPorCobrar',
+    //         'pagados',
+    //         'pendientes',
+    //         'estado'
+    //     ));
+
+    //     return $pdf->stream(
+    //         'reporte_general_' . $estado . '_' . time() . '.pdf'
+    //     );
+    // }
+
+    
     public function reporteGeneral(Request $request)
     {
-        $estado = $request->get('estado', 'ambos'); // pagado | pendiente | ambos
+        $estado = $request->get('estado', 'ambos');
 
-        $prestamos = Loan::with(['client', 'payments', 'type'])->get();
+        // 🔹 Colección BASE (NO se toca)
+        $prestamosBase = Loan::with(['client', 'payments', 'type'])->get();
 
-        // Filtrar según estado
+        // ===============================
+        // RESUMEN (SIEMPRE DESDE BASE)
+        // ===============================
+        $totalPrestado = $prestamosBase->sum('amount');
+
+        $totalPagado = $prestamosBase->sum(function ($loan) {
+            return $loan->payments->where('paid', 1)->sum('amount');
+        });
+
+        $totalPorCobrar = $totalPrestado - $totalPagado;
+
+        $pagados = $prestamosBase->filter(function ($loan) {
+            return $loan->payments->where('paid', 1)->sum('amount') >= $loan->total_to_pay;
+        })->count();
+
+        $pendientes = $prestamosBase->filter(function ($loan) {
+            return $loan->payments->where('paid', 1)->sum('amount') < $loan->total_to_pay;
+        })->count();
+
+        // ===============================
+        // LISTADO (SÍ SE FILTRA)
+        // ===============================
+        $prestamos = $prestamosBase;
+
         if ($estado === 'pagado') {
             $prestamos = $prestamos->filter(function ($loan) {
                 return $loan->payments->where('paid', 1)->sum('amount') >= $loan->total_to_pay;
@@ -674,33 +750,6 @@ class LoanController extends Controller
                 return $loan->payments->where('paid', 1)->sum('amount') < $loan->total_to_pay;
             });
         }
-
-        $totalPrestado = $prestamos->sum('amount');
-
-        $totalPagado = $prestamos->sum(function ($loan) {
-            return $loan->payments->where('paid', 1)->sum('amount');
-        });
-
-        $totalPorCobrar = $totalPrestado - $totalPagado;
-
-        // $pagados = 0;
-        // $pendientes = 0;
-
-        // foreach ($prestamos as $loan) {
-        //     $pagado = $loan->payments->where('paid', 1)->sum('amount');
-        //     $saldo = $loan->total_to_pay - $pagado;
-
-        //     if ($saldo <= 0) $pagados++;
-        //     else $pendientes++;
-        // }
-
-        $pagados = $prestamos->filter(function ($loan) {
-            return $loan->payments->where('paid', 1)->sum('amount') >= $loan->total_to_pay;
-        })->count();
-
-        $pendientes = $prestamos->filter(function ($loan) {
-            return $loan->payments->where('paid', 1)->sum('amount') < $loan->total_to_pay;
-        })->count();
 
         $pdf = Pdf::loadView('loans.reports.general', compact(
             'prestamos',
@@ -717,7 +766,6 @@ class LoanController extends Controller
         );
     }
 
-    
 
     
 
