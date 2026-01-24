@@ -727,11 +727,13 @@ class LoanController extends Controller
         $totalPorCobrar = $totalPrestado - $totalPagado;
 
         $pagados = $prestamosBase->filter(function ($loan) {
-            return $loan->payments->where('paid', 1)->sum('amount') >= $loan->total_to_pay;
+            $cuotasPagadas = $loan->payments->where('paid', 1)->count();
+            return $cuotasPagadas == $loan->num_payments;
         })->count();
 
         $pendientes = $prestamosBase->filter(function ($loan) {
-            return $loan->payments->where('paid', 1)->sum('amount') < $loan->total_to_pay;
+            $cuotasPagadas = $loan->payments->where('paid', 1)->count();
+            return $cuotasPagadas < $loan->num_payments;
         })->count();
 
         // ===============================
