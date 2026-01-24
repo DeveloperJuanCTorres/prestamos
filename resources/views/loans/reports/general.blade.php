@@ -71,7 +71,7 @@
             $pagado = $loan->payments->where('paid', 1)->sum('amount');
         @endphp
 
-        @if($pagado >= $loan->total_to_pay)
+        @if($loan->payments->where('paid', 1)->count() == $loan->num_payments)
             @php
                 $sumMonto += $loan->amount;
                 $sumTotal += $loan->total_to_pay;
@@ -141,7 +141,7 @@
             $saldo = max(0, $loan->total_to_pay - $pagado);
         @endphp
 
-        @if($pagado < $loan->total_to_pay)
+        @if($loan->payments->where('paid', 1)->count() < $loan->num_payments)
             @php
                 $sumMonto += $loan->amount;
                 $sumTotal += $loan->total_to_pay;
