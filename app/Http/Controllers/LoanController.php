@@ -683,16 +683,24 @@ class LoanController extends Controller
 
         $totalPorCobrar = $totalPrestado - $totalPagado;
 
-        $pagados = 0;
-        $pendientes = 0;
+        // $pagados = 0;
+        // $pendientes = 0;
 
-        foreach ($prestamos as $loan) {
-            $pagado = $loan->payments->where('paid', 1)->sum('amount');
-            $saldo = $loan->total_to_pay - $pagado;
+        // foreach ($prestamos as $loan) {
+        //     $pagado = $loan->payments->where('paid', 1)->sum('amount');
+        //     $saldo = $loan->total_to_pay - $pagado;
 
-            if ($saldo <= 0) $pagados++;
-            else $pendientes++;
-        }
+        //     if ($saldo <= 0) $pagados++;
+        //     else $pendientes++;
+        // }
+
+        $pagados = $prestamos->filter(function ($loan) {
+            return $loan->payments->where('paid', 1)->sum('amount') >= $loan->total_to_pay;
+        })->count();
+
+        $pendientes = $prestamos->filter(function ($loan) {
+            return $loan->payments->where('paid', 1)->sum('amount') < $loan->total_to_pay;
+        })->count();
 
         $pdf = Pdf::loadView('loans.reports.general', compact(
             'prestamos',
