@@ -11,17 +11,17 @@
         th, td { border: 1px solid #000; padding: 5px; text-align: center; }
         th { background: #f0f0f0; }
         .resumen td { font-weight: bold; }
-        .titulo-seccion {
-            background: #e9ecef;
-            font-weight: bold;
-            text-align: left;
-        }
     </style>
 </head>
 <body>
 
 <h2>REPORTE GENERAL DE PRÉSTAMOS</h2>
-<p><strong>Fecha:</strong> {{ now()->format('d/m/Y') }}</p>
+
+<p>
+    <strong>Fecha:</strong> {{ now()->format('d/m/Y') }} <br>
+    <strong>Estado:</strong>
+    {{ strtoupper($estado) }}
+</p>
 
 <!-- ================= RESUMEN ================= -->
 <table class="resumen">
@@ -42,7 +42,18 @@
     </tr>
 </table>
 
-<!-- ================= TABLA PAGADOS ================= -->
+@php
+    $pagadosList = $prestamos->filter(fn($loan) =>
+        $loan->payments->where('paid', 1)->count() == $loan->num_payments
+    );
+
+    $pendientesList = $prestamos->filter(fn($loan) =>
+        $loan->payments->where('paid', 1)->count() < $loan->num_payments
+    );
+@endphp
+
+{{-- ================= TABLA PAGADOS ================= --}}
+@if($estado === 'ambos' || $estado === 'pagado')
 <h3>PAGADOS</h3>
 <table>
     <thead>
@@ -61,57 +72,48 @@
     <tbody>
     @php
         $i = 1;
-        $sumMonto = 0;
-        $sumTotal = 0;
-        $sumPagado = 0;
+        $sumMonto = $sumTotal = $sumPagado = 0;
     @endphp
 
-    @foreach($prestamos as $loan)
+    @forelse($pagadosList as $loan)
         @php
-            $pagado = $loan->payments->where('paid', 1)->sum('amount');
+            $pagado = $loan->payments->where('paid',1)->sum('amount');
+            $sumMonto += $loan->amount;
+            $sumTotal += $loan->total_to_pay;
+            $sumPagado += $pagado;
         @endphp
-
-        @if($loan->payments->where('paid', 1)->count() == $loan->num_payments)
-            @php
-                $sumMonto += $loan->amount;
-                $sumTotal += $loan->total_to_pay;
-                $sumPagado += $pagado;
-            @endphp
-
-            <tr>
-                <td>{{ $i++ }}</td>
-                <td>{{ $loan->client->name }}</td>
-                <td>S/ {{ number_format($loan->amount, 2) }}</td>
-                <td>S/ {{ number_format($loan->total_to_pay, 2) }}</td>
-                <td>S/ {{ number_format($pagado, 2) }}</td>
-                <td>S/ 0.00</td>
-                <td>{{ $loan->created_at->format('d/m/Y') }}</td>
-                <td>{{ $loan->type->name }}</td>
-                <td>{{ $loan->payments->where('paid', 1)->count() }}/{{ $loan->num_payments }}</td>
-            </tr>
-        @endif
-    @endforeach
-
-    @if($i === 1)
         <tr>
-            <td colspan="9">No hay préstamos pagados</td>
+            <td>{{ $i++ }}</td>
+            <td>{{ $loan->client->name }}</td>
+            <td>S/ {{ number_format($loan->amount, 2) }}</td>
+            <td>S/ {{ number_format($loan->total_to_pay, 2) }}</td>
+            <td>S/ {{ number_format($pagado, 2) }}</td>
+            <td>S/ 0.00</td>
+            <td>{{ $loan->created_at->format('d/m/Y') }}</td>
+            <td>{{ $loan->type->name }}</td>
+            <td>{{ $loan->num_payments }}/{{ $loan->num_payments }}</td>
         </tr>
-    @else
-        <tr style="font-weight:bold; background:#f8f9fa;">
+    @empty
+        <tr><td colspan="9">No hay préstamos pagados</td></tr>
+    @endforelse
+
+    @if($i > 1)
+        <tr style="font-weight:bold">
             <td colspan="2">TOTAL</td>
             <td>S/ {{ number_format($sumMonto, 2) }}</td>
             <td>S/ {{ number_format($sumTotal, 2) }}</td>
             <td>S/ {{ number_format($sumPagado, 2) }}</td>
             <td colspan="4">
-                Diferencia: S/
-                {{ number_format($sumPagado - $sumMonto, 2) }}
+                Diferencia: S/ {{ number_format($sumPagado - $sumMonto, 2) }}
             </td>
         </tr>
     @endif
     </tbody>
 </table>
+@endif
 
-<!-- ================= TABLA PENDIENTES ================= -->
+{{-- ================= TABLA PENDIENTES ================= --}}
+@if($estado === 'ambos' || $estado === 'pendiente')
 <h3>PENDIENTES</h3>
 <table>
     <thead>
@@ -130,56 +132,46 @@
     <tbody>
     @php
         $i = 1;
-        $sumMonto = 0;
-        $sumTotal = 0;
-        $sumPagado = 0;
+        $sumMonto = $sumTotal = $sumPagado = 0;
     @endphp
 
-    @foreach($prestamos as $loan)
+    @forelse($pendientesList as $loan)
         @php
-            $pagado = $loan->payments->where('paid', 1)->sum('amount');
-            $saldo = max(0, $loan->total_to_pay - $pagado);
+            $pagado = $loan->payments->where('paid',1)->sum('amount');
+            $saldo = $loan->total_to_pay - $pagado;
+            $sumMonto += $loan->amount;
+            $sumTotal += $loan->total_to_pay;
+            $sumPagado += $pagado;
         @endphp
-
-        @if($loan->payments->where('paid', 1)->count() < $loan->num_payments)
-            @php
-                $sumMonto += $loan->amount;
-                $sumTotal += $loan->total_to_pay;
-                $sumPagado += $pagado;
-            @endphp
-
-            <tr>
-                <td>{{ $i++ }}</td>
-                <td>{{ $loan->client->name }}</td>
-                <td>S/ {{ number_format($loan->amount, 2) }}</td>
-                <td>S/ {{ number_format($loan->total_to_pay, 2) }}</td>
-                <td>S/ {{ number_format($pagado, 2) }}</td>
-                <td>S/ {{ number_format($saldo, 2) }}</td>
-                <td>{{ $loan->created_at->format('d/m/Y') }}</td>
-                <td>{{ $loan->type->name }}</td>
-                <td>{{ $loan->payments->where('paid', 1)->count() }}/{{ $loan->num_payments }}</td>
-            </tr>
-        @endif
-    @endforeach
-
-    @if($i === 1)
         <tr>
-            <td colspan="9">No hay préstamos pendientes</td>
+            <td>{{ $i++ }}</td>
+            <td>{{ $loan->client->name }}</td>
+            <td>S/ {{ number_format($loan->amount, 2) }}</td>
+            <td>S/ {{ number_format($loan->total_to_pay, 2) }}</td>
+            <td>S/ {{ number_format($pagado, 2) }}</td>
+            <td>S/ {{ number_format($saldo, 2) }}</td>
+            <td>{{ $loan->created_at->format('d/m/Y') }}</td>
+            <td>{{ $loan->type->name }}</td>
+            <td>{{ $loan->payments->where('paid',1)->count() }}/{{ $loan->num_payments }}</td>
         </tr>
-    @else
-        <tr style="font-weight:bold; background:#f8f9fa;">
+    @empty
+        <tr><td colspan="9">No hay préstamos pendientes</td></tr>
+    @endforelse
+
+    @if($i > 1)
+        <tr style="font-weight:bold">
             <td colspan="2">TOTAL</td>
             <td>S/ {{ number_format($sumMonto, 2) }}</td>
             <td>S/ {{ number_format($sumTotal, 2) }}</td>
             <td>S/ {{ number_format($sumPagado, 2) }}</td>
             <td colspan="4">
-                Diferencia: S/
-                {{ number_format($sumPagado - $sumMonto, 2) }}
+                Diferencia: S/ {{ number_format($sumPagado - $sumMonto, 2) }}
             </td>
         </tr>
     @endif
     </tbody>
 </table>
+@endif
 
 </body>
 </html>
