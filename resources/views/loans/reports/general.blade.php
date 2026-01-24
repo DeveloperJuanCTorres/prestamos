@@ -85,8 +85,8 @@
 
         @forelse($pagadosList as $i => $loan)
             @php
-                $pagado = $loan->payments->sum('amount');
-                $cuotasPagadas = $loan->payments->count();
+                $pagado = $loan->payments->where('paid', 1)->sum('amount');
+                $cuotasPagadas = $loan->payments->where('paid', 1)->count();
                 $totalCuotas = $loan->num_payments;
             @endphp
             <tr>
@@ -115,9 +115,9 @@
 
         @forelse($pendientesList as $i => $loan)
             @php
-                $pagado = $loan->payments->sum('amount');
+                $pagado = $loan->payments->where('paid', 1)->sum('amount');
                 $saldo = $loan->total_to_pay - $pagado;
-                $cuotasPagadas = $loan->payments->count();
+                $cuotasPagadas = $loan->payments->where('paid', 1)->count();
                 $totalCuotas = $loan->num_payments;
             @endphp
             <tr>
