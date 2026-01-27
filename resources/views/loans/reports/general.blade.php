@@ -8,7 +8,7 @@
         h2 { text-align: center; margin-bottom: 5px; }
         h3 { margin-top: 20px; }
         table { width: 100%; border-collapse: collapse; margin-top: 5px; }
-        th, td { border: 1px solid #000; padding: 5px; text-align: center; }
+        th, td { border: 1px solid #000; padding: 5px; text-align: left; }
         th { background: #f0f0f0; }
         .resumen td { font-weight: bold; }
     </style>
@@ -73,6 +73,9 @@
     @php
         $i = 1;
         $sumMonto = $sumTotal = $sumPagado = 0;
+
+        $pagadosList = $pagadosList->sortBy(fn($loan) => $loan->client->name);
+        $pendientesList = $pendientesList->sortBy(fn($loan) => $loan->client->name);
     @endphp
 
     @forelse($pagadosList as $loan)
