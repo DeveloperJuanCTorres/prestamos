@@ -136,6 +136,9 @@
     @php
         $i = 1;
         $sumMonto = $sumTotal = $sumPagado = 0;
+
+        $pagadosList = $pagadosList->sortBy(fn($loan) => $loan->client->name);
+        $pendientesList = $pendientesList->sortBy(fn($loan) => $loan->client->name);
     @endphp
 
     @forelse($pendientesList as $loan)
