@@ -8,7 +8,7 @@
         h2 { text-align: center; margin-bottom: 5px; }
         h3 { margin-top: 20px; }
         table { width: 100%; border-collapse: collapse; margin-top: 5px; }
-        th, td { border: 1px solid #000; padding: 5px; text-align: left; }
+        th, td { border: 1px solid #000; padding: 5px; text-align: left; font-size: 9px;}
         th { background: #f0f0f0; }
         .resumen td { font-weight: bold; }
     </style>
@@ -59,6 +59,7 @@
     <thead>
         <tr>
             <th>#</th>
+            <th>ID</th>
             <th>Cliente</th>
             <th>Monto</th>
             <th>Total</th>
@@ -87,6 +88,7 @@
         @endphp
         <tr>
             <td>{{ $i++ }}</td>
+            <td>{{ $loan->id }}</td>
             <td>{{ $loan->client->name }}</td>
             <td>S/ {{ number_format($loan->amount, 2) }}</td>
             <td>S/ {{ number_format($loan->total_to_pay, 2) }}</td>
@@ -97,12 +99,12 @@
             <td>{{ $loan->num_payments }}/{{ $loan->num_payments }}</td>
         </tr>
     @empty
-        <tr><td colspan="9">No hay préstamos pagados</td></tr>
+        <tr><td colspan="10">No hay préstamos pagados</td></tr>
     @endforelse
 
     @if($i > 1)
         <tr style="font-weight:bold">
-            <td colspan="2">TOTAL</td>
+            <td colspan="3">TOTAL</td>
             <td>S/ {{ number_format($sumMonto, 2) }}</td>
             <td>S/ {{ number_format($sumTotal, 2) }}</td>
             <td>S/ {{ number_format($sumPagado, 2) }}</td>
@@ -122,12 +124,14 @@
     <thead>
         <tr>
             <th>#</th>
+            <th>ID</th>
             <th>Cliente</th>
             <th>Monto</th>
             <th>Total</th>
             <th>Pagado</th>
             <th>Saldo</th>
             <th>Fecha</th>
+            <th>Fecha/V</th>
             <th>Tipo</th>
             <th>Cuota</th>
         </tr>
@@ -151,26 +155,28 @@
         @endphp
         <tr>
             <td>{{ $i++ }}</td>
+            <td>{{ $loan->id }}</td>
             <td>{{ $loan->client->name }}</td>
             <td>S/ {{ number_format($loan->amount, 2) }}</td>
             <td>S/ {{ number_format($loan->total_to_pay, 2) }}</td>
             <td>S/ {{ number_format($pagado, 2) }}</td>
             <td>S/ {{ number_format($saldo, 2) }}</td>
             <td>{{ $loan->created_at->format('d/m/Y') }}</td>
+            <td>{{ $loan->payments->where('paid',0)->first()->due_date }}</td>
             <td>{{ $loan->type->name }}</td>
             <td>{{ $loan->payments->where('paid',1)->count() }}/{{ $loan->num_payments }}</td>
         </tr>
     @empty
-        <tr><td colspan="9">No hay préstamos pendientes</td></tr>
+        <tr><td colspan="11">No hay préstamos pendientes</td></tr>
     @endforelse
 
     @if($i > 1)
         <tr style="font-weight:bold">
-            <td colspan="2">TOTAL</td>
+            <td colspan="3">TOTAL</td>
             <td>S/ {{ number_format($sumMonto, 2) }}</td>
             <td>S/ {{ number_format($sumTotal, 2) }}</td>
             <td>S/ {{ number_format($sumPagado, 2) }}</td>
-            <td colspan="4">
+            <td colspan="5">
                 Diferencia: S/ {{ number_format($sumPagado - $sumMonto, 2) }}
             </td>
         </tr>

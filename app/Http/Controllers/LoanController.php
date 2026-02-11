@@ -10,6 +10,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Spatie\FlareClient\View;
 
 class LoanController extends Controller
 {
@@ -596,11 +597,33 @@ class LoanController extends Controller
     public function ticket($id)
     {
         $payment = LoanPayment::with('loan.client')->findOrFail($id);
+        $loan = Loan::findOrFail($payment->loan_id);
 
-        $pdf = Pdf::loadView('loans.partials.ticket_pdf', compact('payment'))
-                ->setPaper([0, 0, 203, 300]); // Formato ticket 80mm
+        $pdf = Pdf::loadView('loans.partials.ticket_pdf', compact('payment','loan'))
+                ->setPaper([0, 0, 203, 325]); // Formato ticket 80mm
 
         return $pdf->stream('ticket_pago_'.$payment->id.'.pdf');
+    }
+
+    public function ticketWhatsapp($id)
+    {
+        $payment = LoanPayment::with('loan.client')->findOrFail($id);
+
+        // Renderizar la misma vista del PDF
+        $html = view('loans.partials.ticket_pdf', compact('payment'))->render();
+
+        // Convertir HTML a texto plano (WhatsApp)
+        $texto = trim(
+            html_entity_decode(
+                strip_tags(
+                    preg_replace('/<br\s*\/?>/i', "\n", $html)
+                )
+            )
+        );
+
+        return response()->json([
+            'message' => $texto
+        ]);
     }
 
     /**

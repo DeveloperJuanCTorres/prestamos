@@ -27,6 +27,12 @@
                                 <i class="fa fa-print"></i> Ticket
                             </button>
 
+                            <button
+                                class="btn btn-success btn-sm btn-whatsapp-ticket"
+                                data-id="{{ $p->id }}">
+                                <i class="fa fa-whatsapp"></i> WhatsApp
+                            </button>
+
                             @php
                                 $adminEmails = config('app.admin_usernames');
                                 $isAdminUser = auth()->check() && in_array(auth()->user()->email, $adminEmails);

@@ -56,6 +56,9 @@ Route::post('payments/{id}/pay', [LoanController::class, 'pay'])->name('payments
 Route::get('loans/{id}/print-schedule', [LoanController::class, 'printSchedule'])->name('loans.printSchedule');
 Route::get('payments/{id}/ticket', [LoanController::class, 'ticket'])->name('payments.ticket');
 Route::get('payments/{id}/ticket-data', [LoanController::class, 'ticketData'])->name('payments.ticket.data');
+Route::get('payments/{id}/ticket-whatsapp', 
+    [LoanController::class, 'ticketWhatsapp']
+)->name('payments.ticket.whatsapp');
 
 Route::get('loans/{loan}/edit', [LoanController::class, 'edit'])->name('loans.edit');
 Route::put('loans/{loan}', [LoanController::class, 'update'])->name('loans.update');

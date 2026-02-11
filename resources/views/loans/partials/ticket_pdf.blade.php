@@ -40,7 +40,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 3px;
+            margin-top: 1px;
         }
 
         td {
@@ -96,8 +96,18 @@
 
     <table>
         <tr>
-            <td><strong>Préstamo:</strong></td>
+            <td><strong>ID:</strong></td>
             <td>#{{ $payment->loan_id }}</td>
+        </tr>
+
+        <tr>
+            <td><strong>Préstamo:</strong></td>
+            <td>S/. {{ number_format($loan->amount, 2) }}</td>
+        </tr>
+
+        <tr>
+            <td><strong>A Pagar:</strong></td>
+            <td>S/. {{ number_format($loan->total_to_pay, 2) }}</td>
         </tr>
 
         <tr>

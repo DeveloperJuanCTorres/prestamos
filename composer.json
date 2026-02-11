@@ -12,6 +12,7 @@
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
         "laravel/ui": "^4.6",
+        "spatie/browsershot": "^5.2",
         "tcg/voyager": "^1.6"
     },
     "require-dev": {
