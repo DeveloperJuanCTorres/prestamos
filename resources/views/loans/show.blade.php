@@ -229,7 +229,7 @@
 </script>
 
 
-<script>
+<!-- <script>
     document.addEventListener('click', function (e) {
 
         const btn = e.target.closest('.btn-whatsapp-ticket');
@@ -246,7 +246,44 @@
 
             });
     });
+</script> -->
+
+<script>
+document.addEventListener('click', function(e){
+
+    const btn = e.target.closest('.btn-share-pdf');
+    if(!btn) return;
+
+    compartirPDF(btn.dataset.id);
+
+});
+
+async function compartirPDF(id) {
+    try {
+        const response = await fetch(`/payments/${id}/ticket`);
+        const blob = await response.blob();
+
+        const file = new File([blob], `ticket_${id}.pdf`, {
+            type: 'application/pdf'
+        });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+                files: [file],
+                title: `Ticket ${id}`,
+                text: 'Te comparto tu comprobante de pago'
+            });
+        } else {
+            alert('Tu navegador no soporta compartir archivos.');
+        }
+
+    } catch (error) {
+        console.error(error);
+        alert('Error al compartir');
+    }
+}
 </script>
+
 
 @endpush
 @endsection

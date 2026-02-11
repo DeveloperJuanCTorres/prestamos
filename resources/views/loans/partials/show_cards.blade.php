@@ -27,11 +27,16 @@
                                 <i class="fa fa-print"></i> Ticket
                             </button>
 
-                            <button
+                            <!-- <button
                                 class="btn btn-success btn-sm btn-whatsapp-ticket"
                                 data-id="{{ $p->id }}">
                                 <i class="fa fa-whatsapp"></i> WhatsApp
+                            </button> -->
+                            <button class="btn btn-primary btn-share-pdf"
+                                    data-id="{{ $p->id }}">
+                                <i class="fa fa-whatsapp"></i> Compartir PDF
                             </button>
+
 
                             @php
                                 $adminEmails = config('app.admin_usernames');
