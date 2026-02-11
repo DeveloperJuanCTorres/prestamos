@@ -34,7 +34,7 @@
                             </button> -->
                             <button class="btn btn-primary btn-share-pdf"
                                     data-id="{{ $p->id }}">
-                                <i class="fa fa-whatsapp"></i> Compartir PDF
+                                <i class="fa fa-whatsapp"></i> WhatsApp
                             </button>
 
 
