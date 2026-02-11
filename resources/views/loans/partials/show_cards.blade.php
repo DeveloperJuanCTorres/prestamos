@@ -32,9 +32,9 @@
                                 data-id="{{ $p->id }}">
                                 <i class="fa fa-whatsapp"></i> WhatsApp
                             </button> -->
-                            <button class="btn btn-primary btn-share-pdf"
+                            <button class="btn btn-success btn-sm btn-share-pdf"
                                     data-id="{{ $p->id }}">
-                                <i class="fa fa-whatsapp"></i> WhatsApp
+                                <i class="fa fa-whatsapp"></i>
                             </button>
 
 
