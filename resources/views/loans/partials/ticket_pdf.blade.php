@@ -111,6 +111,11 @@
         </tr>
 
         <tr>
+            <td><strong>Tipo:</strong></td>
+            <td>{{ $loan->type->name }}</td>
+        </tr>
+
+        <tr>
             <td><strong>Cuota:</strong></td>
             <td>{{ $payment->cuota }}/{{ $totalCuotas }}</td>
         </tr>
