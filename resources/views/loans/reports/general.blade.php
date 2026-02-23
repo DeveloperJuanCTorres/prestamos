@@ -185,5 +185,77 @@
 </table>
 @endif
 
+{{-- ================= TABLA COBRANZAS ================= --}}
+@if($estado === 'cobranza')
+<h3>PENDIENTES</h3>
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Capital</th>
+            <th>Total</th>
+            <th>Fecha</th>
+            <th>Fecha/V</th>
+            <th>Tipo</th>
+            <th>Cuota</th>
+            <th>Monto</th>
+        </tr>
+    </thead>
+    <tbody>
+    @php
+        $i = 1;
+        $sumMonto = $sumTotal = $sumPagado = 0;
+
+        $pagadosList = $pagadosList->sortBy(fn($loan) => $loan->client->name);
+        $pendientesList = $pendientesList->sortBy(fn($loan) => $loan->client->name);
+    @endphp
+
+    @forelse($pendientesList as $loan)
+        @php
+            $hoy = now();
+
+            // Cuotas vencidas (no pagadas y fecha menor a hoy)
+            $cuotasVencidas = $loan->payments
+                ->where('paid', 0)
+                ->where('due_date', '<', $hoy);
+
+            $montoVencido = $cuotasVencidas->sum('amount');
+
+            $sumMonto += $loan->amount;
+            $sumTotal += $loan->total_to_pay;
+        @endphp
+        <tr>
+            <td>{{ $i++ }}</td>
+            <td>{{ $loan->id }}</td>
+            <td>{{ $loan->client->name }}</td>
+            <td>S/ {{ number_format($loan->amount, 2) }}</td>
+            <td>S/ {{ number_format($loan->total_to_pay, 2) }}</td>
+            <td>{{ $loan->created_at->format('d/m/Y') }}</td>
+            <td>{{ $loan->payments->where('paid',0)->first()->due_date }}</td>
+            <td>{{ $loan->type->name }}</td>
+            <td>{{ $loan->payments->where('paid',1)->count() }}/{{ $loan->num_payments }}</td>
+            <td>S/ {{ number_format($montoVencido, 2) }}</td>
+        </tr>
+    @empty
+        <tr><td colspan="10">No hay préstamos pendientes</td></tr>
+    @endforelse
+
+    @if($i > 1)
+        <tr style="font-weight:bold">
+            <td colspan="3">TOTAL</td>
+            <td>S/ {{ number_format($sumMonto, 2) }}</td>
+            <td>S/ {{ number_format($sumTotal, 2) }}</td>
+            <td>S/ {{ number_format($sumPagado, 2) }}</td>
+            <td colspan="4">
+                Diferencia: S/ {{ number_format($sumPagado - $sumMonto, 2) }}
+            </td>
+        </tr>
+    @endif
+    </tbody>
+</table>
+@endif
+
 </body>
 </html>

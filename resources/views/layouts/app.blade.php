@@ -299,6 +299,10 @@
                             <label class="text-secondary">
                                 <input type="radio" name="estado" value="pendiente">
                                 Solo Pendientes
+                            </label><br>
+                            <label class="text-secondary">
+                                <input type="radio" name="estado" value="cobranza">
+                                Solo Cobranzas
                             </label>
                         </div>
                     `,
