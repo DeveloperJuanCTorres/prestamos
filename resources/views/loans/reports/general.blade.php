@@ -214,17 +214,22 @@
 
     @forelse($pendientesList as $loan)
         @php
-            $hoy = now();
+            // Cuotas pagadas
+            $cuotasPagadas = $loan->payments->where('paid', 1)->count();
 
-            // Cuotas vencidas (no pagadas y fecha menor a hoy)
-            $cuotasVencidas = $loan->payments
+            // Primera cuota pendiente (ordenada por fecha)
+            $cuotaPendiente = $loan->payments
                 ->where('paid', 0)
-                ->where('due_date', '<', $hoy);
+                ->sortBy('due_date')
+                ->first();
 
-            $montoVencido = $cuotasVencidas->sum('amount');
+            $montoCuota = $cuotaPendiente ? $cuotaPendiente->amount : 0;
 
-            $sumMonto += $loan->amount;
-            $sumTotal += $loan->total_to_pay;
+            // Última cuota pagada (para fecha vencimiento que ya tienes)
+            $ultimaPagada = $loan->payments
+                ->where('paid', 1)
+                ->sortByDesc('due_date')
+                ->first();
         @endphp
         <tr>
             <td>{{ $i++ }}</td>
@@ -233,10 +238,14 @@
             <td>S/ {{ number_format($loan->amount, 2) }}</td>
             <td>S/ {{ number_format($loan->total_to_pay, 2) }}</td>
             <td>{{ $loan->created_at->format('d/m/Y') }}</td>
-            <td>{{ $loan->payments->where('paid',0)->first()->due_date }}</td>
+            <!-- <td>{{ $loan->payments->where('paid',0)->first()->due_date }}</td> -->
+             <td>{{ $ultimaPagada 
+                    ? \Carbon\Carbon::parse($ultimaPagada->due_date)->format('d/m/Y') 
+                    : '-' 
+                }}</td>
             <td>{{ $loan->type->name }}</td>
-            <td>{{ $loan->payments->where('paid',1)->count() }}/{{ $loan->num_payments }}</td>
-            <td>S/ {{ number_format($montoVencido, 2) }}</td>
+            <td>{{ $cuotasPagadas }}/{{ $loan->num_payments }}</td>
+            <td>S/ {{ number_format($montoCuota, 2) }}</td>
         </tr>
     @empty
         <tr><td colspan="10">No hay préstamos pendientes</td></tr>
