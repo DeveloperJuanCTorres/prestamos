@@ -156,7 +156,7 @@
         <tr>
             <td>{{ $i++ }}</td>
             <td>{{ $loan->id }}</td>
-            <td>{{ $loan->client->name ?? 'Sin cliente'}}</td>
+            <td>{{ $loan->client->name . $loan->client->id ?? 'Sin cliente'}}</td>
             <td>S/ {{ number_format($loan->amount, 2) }}</td>
             <td>S/ {{ number_format($loan->total_to_pay, 2) }}</td>
             <td>S/ {{ number_format($pagado, 2) }}</td>
