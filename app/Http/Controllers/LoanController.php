@@ -259,6 +259,13 @@ class LoanController extends Controller
 
             $payments     = [];
             $currentDate  = Carbon::now()->addDays($periodDays);
+            
+            if ($periodDays == 1) {
+                while ($currentDate->dayOfWeek == Carbon::SUNDAY) {
+                    $currentDate->addDay();
+                }
+            }
+
             $accumulated  = 0;
 
             for ($i = 1; $i <= $numPayments; $i++) {
@@ -280,7 +287,14 @@ class LoanController extends Controller
                     'updated_at' => now(),
                 ];
 
-                $currentDate = $currentDate->copy()->addDays($periodDays);
+                // $currentDate = $currentDate->copy()->addDays($periodDays);
+                if ($periodDays == 1) { // Tipo diario
+                    do {
+                        $currentDate = $currentDate->copy()->addDay();
+                    } while ($currentDate->dayOfWeek == Carbon::SUNDAY);
+                } else {
+                    $currentDate = $currentDate->copy()->addDays($periodDays);
+                }
             }
 
             // Insertar cuotas
@@ -567,15 +581,6 @@ class LoanController extends Controller
         ]);
     }
 
-    // public function printSchedule($id)
-    // {
-    //     $loan = Loan::with('payments')->findOrFail($id);
-
-    //     $pdf = Pdf::loadView('loans.partials.schedule_pdf', compact('loan'));
-    //     // return $pdf->download('cronograma_prestamo_'.$loan->id.'.pdf');
-    //     return $pdf->stream('cronograma_'.$loan->id.'_'.time().'.pdf');
-    // }
-
     public function printSchedule($id)
     {
         $loan = Loan::with('payments')->findOrFail($id);
@@ -675,121 +680,9 @@ class LoanController extends Controller
                 'bluetooth_data_url' => route('payments.ticket.data', $id)
             ]
         ]);
-    }
+    }  
 
-    
-
-    // public function reporteGeneral(Request $request)
-    // {
-    //     $estado = $request->get('estado', 'ambos'); // pagado | pendiente | ambos
-
-    //     $prestamos = Loan::with(['client', 'payments', 'type'])->get();
-
-    //     // Filtrar según estado
-    //     if ($estado === 'pagado') {
-    //         $prestamos = $prestamos->filter(function ($loan) {
-    //             return $loan->payments->where('paid', 1)->sum('amount') >= $loan->total_to_pay;
-    //         });
-    //     }
-
-    //     if ($estado === 'pendiente') {
-    //         $prestamos = $prestamos->filter(function ($loan) {
-    //             return $loan->payments->where('paid', 1)->sum('amount') < $loan->total_to_pay;
-    //         });
-    //     }
-
-    //     $totalPrestado = $prestamos->sum('amount');
-
-    //     $totalPagado = $prestamos->sum(function ($loan) {
-    //         return $loan->payments->where('paid', 1)->sum('amount');
-    //     });
-
-    //     $totalPorCobrar = $totalPrestado - $totalPagado;
-
-
-    //     $pagados = $prestamos->filter(function ($loan) {
-    //         return $loan->payments->where('paid', 1)->sum('amount') >= $loan->total_to_pay;
-    //     })->count();
-
-    //     $pendientes = $prestamos->filter(function ($loan) {
-    //         return $loan->payments->where('paid', 1)->sum('amount') < $loan->total_to_pay;
-    //     })->count();
-
-    //     $pdf = Pdf::loadView('loans.reports.general', compact(
-    //         'prestamos',
-    //         'totalPrestado',
-    //         'totalPagado',
-    //         'totalPorCobrar',
-    //         'pagados',
-    //         'pendientes',
-    //         'estado'
-    //     ));
-
-    //     return $pdf->stream(
-    //         'reporte_general_' . $estado . '_' . time() . '.pdf'
-    //     );
-    // }
-
-    
-    // public function reporteGeneral(Request $request)
-    // {
-    //     $estado = $request->get('estado', 'ambos');
-
-    //     // 🔹 Colección BASE (NO se toca)
-    //     $prestamosBase = Loan::with(['client', 'payments', 'type'])->get();
-
-    //     // ===============================
-    //     // RESUMEN (SIEMPRE DESDE BASE)
-    //     // ===============================
-    //     $totalPrestado = $prestamosBase->sum('amount');
-
-    //     $totalPagado = $prestamosBase->sum(function ($loan) {
-    //         return $loan->payments->where('paid', 1)->sum('amount');
-    //     });
-
-    //     $totalPorCobrar = $totalPrestado - $totalPagado;
-
-    //     $pagados = $prestamosBase->filter(function ($loan) {
-    //         $cuotasPagadas = $loan->payments->where('paid', 1)->count();
-    //         return $cuotasPagadas == $loan->num_payments;
-    //     })->count();
-
-    //     $pendientes = $prestamosBase->filter(function ($loan) {
-    //         $cuotasPagadas = $loan->payments->where('paid', 1)->count();
-    //         return $cuotasPagadas < $loan->num_payments;
-    //     })->count();
-
-    //     // ===============================
-    //     // LISTADO (SÍ SE FILTRA)
-    //     // ===============================
-    //     $prestamos = $prestamosBase;
-
-    //     if ($estado === 'pagado') {
-    //         $prestamos = $prestamos->filter(function ($loan) {
-    //             return $loan->payments->where('paid', 1)->sum('amount') >= $loan->total_to_pay;
-    //         });
-    //     }
-
-    //     if ($estado === 'pendiente') {
-    //         $prestamos = $prestamos->filter(function ($loan) {
-    //             return $loan->payments->where('paid', 1)->sum('amount') < $loan->total_to_pay;
-    //         });
-    //     }
-
-    //     $pdf = Pdf::loadView('loans.reports.general', compact(
-    //         'prestamos',
-    //         'totalPrestado',
-    //         'totalPagado',
-    //         'totalPorCobrar',
-    //         'pagados',
-    //         'pendientes',
-    //         'estado'
-    //     ));
-
-    //     return $pdf->stream(
-    //         'reporte_general_' . $estado . '_' . time() . '.pdf'
-    //     );
-    // }
+   
 
     public function reporteGeneral(Request $request)
     {
@@ -830,11 +723,6 @@ class LoanController extends Controller
             'reporte_general_' . $estado . '_' . time() . '.pdf'
         );
     }
-
-
-
-    
-
 
     public function reporteClientes()
     {
