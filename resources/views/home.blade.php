@@ -193,7 +193,7 @@
                                         @foreach ($prestamosVencidos as $prestamo)
                                             @foreach ($prestamo->payments as $cuota)
                                                 <tr>
-                                                    <td>{{ $prestamo->client->name }}</td>
+                                                    <td>@if($prestamo->client->name){{ $prestamo->client->name }}@endif</td>
                                                     <td>#{{ $prestamo->id }}</td>
                                                     <td>S/. {{ number_format($prestamo->amount, 2) }}</td>
                                                     <td>S/. {{ number_format($cuota->amount, 2) }}</td>
