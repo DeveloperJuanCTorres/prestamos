@@ -220,7 +220,7 @@
 
                                                 <div class="d-flex justify-content-between mb-2">
                                                     <strong>Cliente:</strong>
-                                                    <span><td>{{ $prestamo->client?->name ?? 'Sin cliente' }}</td></span>
+                                                    <span><td>{{ $prestamo->client->name ?? 'Sin cliente' }}</td></span>
                                                 </div>
 
                                                 <div class="d-flex justify-content-between mb-2">
