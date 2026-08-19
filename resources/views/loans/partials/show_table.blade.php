@@ -15,7 +15,7 @@
                     <td>{{ $p->due_date }}</td>
                     <td>S/. {{ number_format($p->amount,2) }}</td>
                     <td>
-                        @if($p->paid)
+                        @if($p->status === 'paid' || ($p->status !== 'cancelled' && $p->paid == 1))
                             <!-- <span class="badge bg-success">PAGADO</span> -->
 
                             <button class="btn btn-dark btn-sm btn-print-ticket" data-id="{{ $p->id }}">
@@ -35,6 +35,8 @@
                                 </form>
                             @endif
 
+                        @elseif($p->status === 'cancelled')
+                            <span class="badge badge-secondary" style="background-color: #6c757d; color: white; padding: 5px 10px;">ANULADO</span>
                         @else
                             <button class="btn btn-primary btn-sm btn-pay" data-id="{{ $p->id }}">
                                 Pagar

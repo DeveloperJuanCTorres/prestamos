@@ -56,12 +56,18 @@ Route::post('payments/{id}/pay', [LoanController::class, 'pay'])->name('payments
 Route::get('loans/{id}/print-schedule', [LoanController::class, 'printSchedule'])->name('loans.printSchedule');
 Route::get('payments/{id}/ticket', [LoanController::class, 'ticket'])->name('payments.ticket');
 Route::get('payments/{id}/ticket-data', [LoanController::class, 'ticketData'])->name('payments.ticket.data');
-Route::get('payments/{id}/ticket-whatsapp', 
+Route::get('payments/{id}/ticket-whatsapp',
     [LoanController::class, 'ticketWhatsapp']
 )->name('payments.ticket.whatsapp');
 
 Route::get('loans/{loan}/edit', [LoanController::class, 'edit'])->name('loans.edit');
 Route::put('loans/{loan}', [LoanController::class, 'update'])->name('loans.update');
+
+// Liquidación de deuda
+Route::get('loans/{loan}/liquidation-summary', [LoanController::class, 'getLiquidationSummary'])->name('loans.liquidation.summary');
+Route::get('loans/{loan}/liquidation-form', [LoanController::class, 'showLiquidationForm'])->name('loans.liquidation.form');
+Route::post('loans/{loan}/liquidate', [LoanController::class, 'liquidate'])->name('loans.liquidate');
+Route::get('loans/{loan}/liquidation-details', [LoanController::class, 'getLiquidationDetails'])->name('loans.liquidation.details');
 
 Route::post('/payments/{id}/cancelar', [LoanController::class, 'cancelar'])
         ->name('payments.cancelar');
@@ -78,6 +84,9 @@ Route::get('/reporte-prestamos', [LoanController::class, 'reportePrestamos'])
 
 Route::get('/reporte-pagos', [LoanController::class, 'reportePagos'])
 ->name('reporte.pagos');
+
+Route::get('/reporte-liquidaciones', [LoanController::class, 'reporteLiquidaciones'])
+    ->name('reporte.liquidaciones');
 
 // Endpoint AJAX para límites
 Route::get('/types/{id}/limits', [LoanController::class, 'typeLimits'])->name('types.limits');

@@ -20,9 +20,26 @@
                                 <a href="/loans/create" class="btn btn-success"><i class="fa fa-plus px-2"></i>Nuevo</a>
                             </div>
 
-                            <div class="d-flex mb-3">
-                                <input type="text" id="search" class="form-control w-25 mr-2" placeholder="Buscar...">
-                                <select id="perPage" class="form-control w-25">
+                            <div class="d-flex flex-wrap gap-2 mb-3">
+                                <input type="text" id="search" class="form-control" style="flex: 1; min-width: 200px;" placeholder="Buscar por nombre o ID...">
+
+                                <select id="status" class="form-control" style="flex: 0.8; min-width: 150px;">
+                                    <option value="all">Todos los estados</option>
+                                    <option value="paid">Pagados</option>
+                                    <option value="pending">Con cuotas pendientes</option>
+                                </select>
+
+                                <select id="sort" class="form-control" style="flex: 0.8; min-width: 150px;">
+                                    <option value="id">Ordenar por: ID</option>
+                                    <option value="created_at">Ordenar por: Fecha</option>
+                                </select>
+
+                                <select id="order" class="form-control" style="flex: 0.8; min-width: 150px;">
+                                    <option value="desc" selected>Descendente</option>
+                                    <option value="asc">Ascendente</option>
+                                </select>
+
+                                <select id="perPage" class="form-control" style="flex: 0.8; min-width: 120px;">
                                     <option value="5">5 por página</option>
                                     <option value="10" selected>10 por página</option>
                                     <option value="25">25 por página</option>
@@ -57,7 +74,7 @@
                             </div>
 
                             <!-- Contenedor de paginación -->
-                            <div class="d-flex justify-content-center mt-2">
+                            <div class="d-flex justify-content-center mt-2" id="pagination-container">
                                 <div class="pagination-sm">
                                     {{ $loans->links('pagination::bootstrap-4') }}
                                 </div>
@@ -72,7 +89,7 @@
 
     <a href="javaScript:void();" class="back-to-top"><i class="fa fa-angle-double-up"></i></a>
 
-   
+
     @include('partials.footer')
 
 </div>
@@ -82,16 +99,26 @@
 
 <script>
     // ===============================
-    // Función para cargar clientes
+    // Función para cargar préstamos
     // ===============================
     function loadTypes(page = 1) {
         let search = $("#search").val();
         let perPage = $("#perPage").val();
+        let status = $("#status").val();
+        let sort = $("#sort").val();
+        let order = $("#order").val();
 
         $.ajax({
             url: "{{ route('loans.list') }}",
             type: "GET",
-            data: { search: search, perPage: perPage, page: page },
+            data: {
+                search: search,
+                perPage: perPage,
+                page: page,
+                status: status,
+                sort: sort,
+                order: order
+            },
             dataType: "json",
             success: function(data) {
                 // Actualizar tabla y paginación
@@ -108,6 +135,21 @@
     $("#search").on("keyup", function() { loadTypes(); });
 
     // ===============================
+    // Filtrar por estado
+    // ===============================
+    $("#status").on("change", function() { loadTypes(); });
+
+    // ===============================
+    // Cambiar ordenamiento
+    // ===============================
+    $("#sort").on("change", function() { loadTypes(); });
+
+    // ===============================
+    // Cambiar orden (asc/desc)
+    // ===============================
+    $("#order").on("change", function() { loadTypes(); });
+
+    // ===============================
     // Cambiar cantidad de registros
     // ===============================
     $("#perPage").on("change", function() { loadTypes(); });
@@ -118,7 +160,7 @@
     $(document).on("click", "#pagination-container a", function(e){
         e.preventDefault();
         let page = $(this).attr("href").split('page=')[1];
-        loadTipes(page);
+        loadTypes(page);
     });
 
     // ===============================
@@ -131,7 +173,7 @@
     $(document).on("click", ".registrar", function(e){
         e.preventDefault();
         let formData = new FormData($("#formAgregar")[0]);
-        
+
 
         $.ajax({
             url: "{{ route('types.store') }}",

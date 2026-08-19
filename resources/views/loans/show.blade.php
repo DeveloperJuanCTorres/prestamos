@@ -18,7 +18,7 @@
                     <p><strong>Fecha:</strong> {{$loan->created_at->format('d/m/Y') }}</p>
                     <p><strong>Tipo:</strong> {{ $loan->type?->name ?? 'Tipo eliminado' }}</p>
                     <p><strong>Monto:</strong> S/. {{ number_format($loan->amount,2) }}</p>
-                    <p><strong>% Interés:</strong> {{ number_format($loan->interest_percent,2) }}%</p>
+                    <p><strong>Interés:</strong> {{ number_format($loan->interest_percent,2) }}%</p>
                     <p><strong>Interés total:</strong> S/. {{ number_format($loan->total_to_pay - $loan->amount,2) }}</p>
                     <p><strong>Total a pagar:</strong> S/. {{ number_format($loan->total_to_pay,2) }}</p>
                     <p><strong>Cuotas:</strong> {{ $loan->num_payments }}</p>
@@ -32,7 +32,38 @@
                 target="_blank">
                     <i class="fa fa-print"></i> Imprimir cronograma
                 </a>
+
+                @if ($loan->isLiquidated())
+                    <!-- Estado: Liquidado -->
+                    <span class="badge badge-success ml-2">
+                        <i class="fa fa-check-circle"></i> LIQUIDADO
+                    </span>
+                @elseif ($loan->canBeLiquidated())
+                    <!-- Botón: Liquidar Deuda -->
+                    <a href="{{ route('loans.liquidation.form', $loan->id) }}" class="btn btn-warning ml-2">
+                        <i class="fa fa-money"></i> Liquidar Deuda
+                    </a>
+                @endif
             </div>
+
+            @if ($loan->isLiquidated() && $loan->liquidation)
+                <!-- Sección: Información de Liquidación -->
+                <div class="alert alert-success mb-3">
+                    <h5><i class="fa fa-check-circle"></i> Información de Liquidación</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Fecha de liquidación:</strong> {{ $loan->liquidation->liquidation_date->format('d/m/Y H:i') }}</p>
+                            <p><strong>Capital liquidado:</strong> S/. {{ number_format($loan->liquidation->principal_paid, 2) }}</p>
+                            <p><strong>Interés pagado:</strong> S/. {{ number_format($loan->liquidation->interest_paid, 2) }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Total pagado:</strong> S/. {{ number_format($loan->liquidation->total_paid, 2) }}</p>
+                            <p><strong>Cuotas canceladas:</strong> {{ $loan->liquidation->cuota_vigente - 1 }} restantes</p>
+                            <p><strong>Realizado por:</strong> {{ $loan->liquidation->user->name ?? 'Sistema' }}</p>
+                        </div>
+                    </div>
+                </div>
+            @endif
 
             <h5>Cronograma de pagos</h5>
             @include('loans.partials.show_table')
@@ -56,7 +87,7 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        
+
         // Manejar clics en botón "Pagar"
         document.querySelectorAll('.btn-pay').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -105,14 +136,14 @@
         document.querySelectorAll('.btn-print-ticket').forEach(btn => {
             btn.addEventListener('click', async function() {
                 const paymentId = this.getAttribute('data-id');
-                
+
                 try {
                     // Obtener datos del ticket y información del dispositivo
                     const response = await fetch(`/payments/${paymentId}/ticket-data`);
                     const data = await response.json();
-                    
+
                     const { ticket_data, device_info, urls } = data;
-                    
+
                     // Mostrar opciones según capacidades del dispositivo
                     if (device_info.supports_bluetooth) {
                         // Dispositivo compatible con Web Bluetooth
@@ -124,7 +155,7 @@
                         // Fallback - abrir PDF
                         window.open(urls.pdf_url, '_blank');
                     }
-                    
+
                 } catch (error) {
                     console.error('Error obteniendo datos del ticket:', error);
                     // Fallback en caso de error
@@ -180,7 +211,7 @@
         async function printViaBluetooth(ticketData) {
             try {
                 const printer = window.bluetoothPrinter;
-                
+
                 if (!printer.isSupported) {
                     throw new Error('Tu dispositivo no soporta impresión Bluetooth');
                 }
@@ -197,10 +228,10 @@
 
                 // Conectar a impresora
                 await printer.connect();
-                
+
                 // Imprimir
                 await printer.print(ticketData);
-                
+
                 Swal.fire({
                     title: '¡Éxito!',
                     text: 'Ticket enviado a la impresora',
@@ -210,7 +241,7 @@
 
             } catch (error) {
                 console.error('Error imprimiendo:', error);
-                
+
                 Swal.fire({
                     title: 'Error de Impresión',
                     text: error.message || 'No se pudo conectar a la impresora Bluetooth',

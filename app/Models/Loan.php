@@ -12,15 +12,18 @@ class Loan extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'client_id', 
-        'type_id', 
-        'amount', 
-        'interest_percent', 
+        'client_id',
+        'type_id',
+        'amount',
+        'interest_percent',
         'total_to_pay',
-        'num_payments'
+        'num_payments',
+        'liquidated',
+        'liquidation_date',
+        'state'
     ];
 
-    protected $dates = ['deleted_at'];
+    protected $dates = ['deleted_at', 'liquidation_date'];
 
     public function client()
     {
@@ -37,13 +40,103 @@ class Loan extends Model
         return $this->hasMany(LoanPayment::class, 'loan_id');
     }
 
+    public function liquidation()
+    {
+        return $this->hasOne(Liquidation::class);
+    }
+
     public function getEstadoAttribute()
     {
-        return $this->payments()->where('paid', 0)->count() === 0 ? 'pagado' : 'pendiente';
+        if ($this->isLiquidated()) {
+            return 'liquidado';
+        }
+        return $this->getPendingPaymentsCount() === 0 ? 'pagado' : 'pendiente';
     }
 
     public function hasAnyPaidPayment()
     {
-        return $this->payments()->where('paid', 1)->exists();
+        return $this->getPaidPaymentsCount() > 0;
+    }
+
+    /**
+     * Verificar si el préstamo ya ha sido liquidado
+     */
+    public function isLiquidated()
+    {
+        return $this->liquidated === 1 || $this->state === 'liquidated';
+    }
+
+    /**
+     * Verificar si el préstamo puede ser liquidado
+     */
+    public function canBeLiquidated()
+    {
+        return !$this->isLiquidated() && $this->hasPendingPayments();
+    }
+
+    /**
+     * Obtener el capital pagado hasta ahora (porción de capital de las cuotas pagadas)
+     */
+    public function getCapitalPaid()
+    {
+        $paidCount = $this->getPaidPaymentsCount();
+        if ($this->num_payments <= 0) {
+            return 0.0;
+        }
+        return ($this->amount / $this->num_payments) * $paidCount;
+    }
+
+    /**
+     * Obtener el capital restante
+     */
+    public function getCapitalRemaining()
+    {
+        return $this->amount - $this->getCapitalPaid();
+    }
+
+    /**
+     * Verificar si hay cuotas pendientes
+     */
+    public function hasPendingPayments()
+    {
+        return $this->getPendingPaymentsCount() > 0;
+    }
+
+    /**
+     * Obtener cantidad de cuotas pendientes
+     */
+    public function getPendingPaymentsCount()
+    {
+        return $this->payments()
+                    ->whereNull('deleted_at')
+                    ->where(function ($q) {
+                        $q->where('status', 'pending')
+                          ->orWhereNull('status');
+                    })
+                    ->where(function ($q2) {
+                        $q2->where('paid', 0)
+                           ->orWhereNull('paid');
+                    })
+                    ->count();
+    }
+
+    /**
+     * Obtener cantidad de cuotas pagadas
+     */
+    public function getPaidPaymentsCount()
+    {
+        return $this->payments()
+                    ->whereNull('deleted_at')
+                    ->where(function ($q) {
+                        $q->where('status', 'paid')
+                          ->orWhere(function ($sub) {
+                              $sub->where('paid', 1)
+                                  ->where(function ($s) {
+                                      $s->where('status', '!=', 'cancelled')
+                                        ->orWhereNull('status');
+                                  });
+                          });
+                    })
+                    ->count();
     }
 }

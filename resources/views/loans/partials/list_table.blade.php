@@ -14,6 +14,8 @@
         <td class="text-center">
             @if ($loan->estado == 'pagado')
                 <span class="badge badge-success">PAGADO</span>
+            @elseif ($loan->estado == 'liquidado')
+                <span class="badge badge-warning" style="background-color: #ffc107; color: #212529;">LIQUIDADO</span>
             @else
                 <span class="badge badge-danger">PENDIENTE</span>
             @endif

@@ -21,7 +21,7 @@
                 <div class="d-flex justify-content-between align-items-center mt-3">
                     <strong>Estado:</strong>
 
-                    @if($p->paid)
+                    @if($p->status === 'paid' || ($p->status !== 'cancelled' && $p->paid == 1))
                         <div class="d-flex gap-2">
                             <button class="btn btn-dark btn-sm btn-print-ticket" data-id="{{ $p->id }}">
                                 <i class="fa fa-print"></i> Ticket
@@ -53,6 +53,8 @@
                                 </form>
                             @endif
                         </div>
+                    @elseif($p->status === 'cancelled')
+                        <span class="badge badge-secondary" style="background-color: #6c757d; color: white; padding: 5px 10px;">ANULADO</span>
                     @else
                         <button class="btn btn-primary btn-sm btn-pay" data-id="{{ $p->id }}">
                             Pagar
