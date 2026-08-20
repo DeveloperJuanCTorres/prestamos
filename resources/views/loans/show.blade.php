@@ -49,7 +49,20 @@
             @if ($loan->isLiquidated() && $loan->liquidation)
                 <!-- Sección: Información de Liquidación -->
                 <div class="alert alert-success mb-3">
-                    <h5><i class="fa fa-check-circle"></i> Información de Liquidación</h5>
+                    <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
+                        <h5 class="m-0"><i class="fa fa-check-circle"></i> Información de Liquidación</h5>
+                        <div class="mt-2 mt-md-0">
+                            <!-- Imprimir Constancia A4 -->
+                            <a href="{{ route('loans.liquidation.receipt', $loan->id) }}" target="_blank" class="btn btn-dark btn-sm mr-1 mb-1">
+                                <i class="fa fa-file-pdf-o mr-1"></i> Imprimir Constancia A4
+                            </a>
+
+                            <!-- Compartir en Celular (WhatsApp / Web Share API) -->
+                            <button type="button" class="btn btn-success btn-sm btn-share-liquidation mb-1 d-inline-block d-md-none" data-id="{{ $loan->id }}">
+                                <i class="fa fa-whatsapp mr-1"></i> Compartir
+                            </button>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-md-6">
                             <p><strong>Fecha de liquidación:</strong> {{ $loan->liquidation->liquidation_date->format('d/m/Y H:i') }}</p>
@@ -311,6 +324,42 @@ async function compartirPDF(id) {
     } catch (error) {
         console.error(error);
         alert('Error al compartir');
+    }
+}
+</script>
+
+<script>
+document.addEventListener('click', function(e){
+    const btn = e.target.closest('.btn-share-liquidation');
+    if(!btn) return;
+
+    let loanId = btn.dataset.id;
+    compartirLiquidacion(loanId);
+});
+
+async function compartirLiquidacion(loanId) {
+    try {
+        const receiptUrl = `/loans/${loanId}/liquidation-receipt`;
+        const response = await fetch(receiptUrl);
+        const blob = await response.blob();
+
+        const file = new File([blob], `constancia_liquidacion_prestamo_${loanId}.pdf`, {
+            type: 'application/pdf'
+        });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+                files: [file],
+                title: `Constancia de Liquidación #${loanId}`,
+                text: `Constancia de cancelación total de deuda del préstamo #${loanId}.`
+            });
+        } else {
+            const shareText = encodeURIComponent(`*CONSTANCIA DE LIQUIDACIÓN DE DEUDA*\nPréstamo #${loanId}\nSu deuda ha sido 100% liquidada.\nPuede ver su constancia A4 aquí: ${window.location.origin}${receiptUrl}`);
+            window.open(`https://api.whatsapp.com/send?text=${shareText}`, '_blank');
+        }
+    } catch (error) {
+        console.error(error);
+        alert('Error al compartir la constancia.');
     }
 }
 </script>

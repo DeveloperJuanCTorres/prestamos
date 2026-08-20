@@ -68,6 +68,7 @@ Route::get('loans/{loan}/liquidation-summary', [LoanController::class, 'getLiqui
 Route::get('loans/{loan}/liquidation-form', [LoanController::class, 'showLiquidationForm'])->name('loans.liquidation.form');
 Route::post('loans/{loan}/liquidate', [LoanController::class, 'liquidate'])->name('loans.liquidate');
 Route::get('loans/{loan}/liquidation-details', [LoanController::class, 'getLiquidationDetails'])->name('loans.liquidation.details');
+Route::get('loans/{loan}/liquidation-receipt', [LoanController::class, 'liquidationReceipt'])->name('loans.liquidation.receipt');
 
 Route::post('/payments/{id}/cancelar', [LoanController::class, 'cancelar'])
         ->name('payments.cancelar');

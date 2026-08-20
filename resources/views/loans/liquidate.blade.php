@@ -138,7 +138,7 @@
 
                                     <div class="row bg-white p-3 rounded">
                                         <div class="col-md-6">
-                                            <p class="text-muted mb-1">Interés del mes vigente:</p>
+                                            <p class="text-muted mb-1">Interés a cancelar:</p>
                                             <p class="h5 text-warning">$${parseFloat(data.current_month_interest).toFixed(2)}</p>
                                         </div>
                                         <div class="col-md-6 text-right">

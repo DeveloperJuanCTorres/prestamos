@@ -75,15 +75,33 @@ class Loan extends Model
     }
 
     /**
+     * Obtener la porción de capital por cuota
+     */
+    public function getCapitalPerPaymentAttribute()
+    {
+        if ($this->num_payments <= 0) {
+            return 0.0;
+        }
+        return $this->amount / $this->num_payments;
+    }
+
+    /**
+     * Obtener la porción de interés por cuota
+     */
+    public function getInterestPerPaymentAttribute()
+    {
+        if ($this->num_payments <= 0) {
+            return 0.0;
+        }
+        return max(0, $this->total_to_pay - $this->amount) / $this->num_payments;
+    }
+
+    /**
      * Obtener el capital pagado hasta ahora (porción de capital de las cuotas pagadas)
      */
     public function getCapitalPaid()
     {
-        $paidCount = $this->getPaidPaymentsCount();
-        if ($this->num_payments <= 0) {
-            return 0.0;
-        }
-        return ($this->amount / $this->num_payments) * $paidCount;
+        return $this->capital_per_payment * $this->getPaidPaymentsCount();
     }
 
     /**
@@ -91,7 +109,7 @@ class Loan extends Model
      */
     public function getCapitalRemaining()
     {
-        return $this->amount - $this->getCapitalPaid();
+        return max(0, $this->amount - $this->getCapitalPaid());
     }
 
     /**

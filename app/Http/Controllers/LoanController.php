@@ -713,8 +713,7 @@ class LoanController extends Controller
 
         $capitalPaid = $loan->getCapitalPaid();
         $capitalRemaining = $loan->getCapitalRemaining();
-        $periodDays = $loan->type->periodicity_days ?? 30;
-        $interestVigente = $capitalRemaining * ($loan->interest_percent / 100) * ($periodDays / 30);
+        $interestVigente = $loan->interest_per_payment;
         $totalToPay = $capitalRemaining + $interestVigente;
 
         return response()->json([
@@ -731,7 +730,7 @@ class LoanController extends Controller
             'paid_quotes' => $loan->getPaidPaymentsCount(),
             'pending_quotes' => $loan->getPendingPaymentsCount(),
             'quotes_to_cancel' => $loan->getPendingPaymentsCount(),
-            'interest_note' => 'Interés correspondiente al periodo de una cuota pendiente'
+            'interest_note' => 'Interés correspondiente a la cuota vigente'
         ]);
     }
 
@@ -772,8 +771,7 @@ class LoanController extends Controller
         DB::beginTransaction();
         try {
             $capitalRemaining = $loan->getCapitalRemaining();
-            $periodDays = $loan->type->periodicity_days ?? 30;
-            $interestVigente = $capitalRemaining * ($loan->interest_percent / 100) * ($periodDays / 30);
+            $interestVigente = $loan->interest_per_payment;
             $totalToPay = $capitalRemaining + $interestVigente;
 
             // 1️⃣ Crear registro de liquidación
@@ -879,6 +877,25 @@ class LoanController extends Controller
         ));
 
         return $pdf->stream('reporte_liquidaciones_' . time() . '.pdf');
+    }
+
+    /**
+     * Generar / Imprimir Constancia A4 de Liquidación de Deuda (PDF)
+     */
+    public function liquidationReceipt(Loan $loan)
+    {
+        if (!$loan->isLiquidated() || !$loan->liquidation) {
+            return redirect()->route('loans.show', $loan->id)
+                ->with('error', 'El préstamo aún no ha sido liquidado.');
+        }
+
+        $loan->load(['client', 'type', 'payments', 'liquidation.user']);
+        $liquidation = $loan->liquidation;
+
+        $pdf = Pdf::loadView('reports.liquidation_receipt', compact('loan', 'liquidation'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->stream('constancia_liquidacion_prestamo_' . $loan->id . '.pdf');
     }
 }
 
