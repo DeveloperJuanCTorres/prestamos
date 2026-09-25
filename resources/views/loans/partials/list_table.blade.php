@@ -12,12 +12,14 @@
         </td>
         <td>S/. {{$loan->total_to_pay}}</td>
         <td class="text-center">
-            @if ($loan->estado == 'pagado')
+            @if ($loan->estado_detalle == 'pagado')
                 <span class="badge badge-success">PAGADO</span>
-            @elseif ($loan->estado == 'liquidado')
+            @elseif ($loan->estado_detalle == 'liquidado')
                 <span class="badge badge-warning" style="background-color: #ffc107; color: #212529;">LIQUIDADO</span>
+            @elseif ($loan->estado_detalle == 'atrasado')
+                <span class="badge badge-danger" title="Tiene cuotas vencidas">CON ATRASO ({{ $loan->getMaxOverdueDays() }}d)</span>
             @else
-                <span class="badge badge-danger">PENDIENTE</span>
+                <span class="badge badge-info" style="background-color: #17a2b8; color: white;">AL DÍA</span>
             @endif
         </td>
         <td class="text-center">

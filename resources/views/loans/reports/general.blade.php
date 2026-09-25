@@ -162,7 +162,7 @@
             <td>S/ {{ number_format($pagado, 2) }}</td>
             <td>S/ {{ number_format($saldo, 2) }}</td>
             <td>{{ $loan->created_at->format('d/m/Y') }}</td>
-            <td>{{ $loan->payments->where('paid',0)->first()->due_date }}</td>
+            <td>{{ optional($loan->payments->where('paid',0)->first())->fecha_vencimiento_formatted ?? '-' }}</td>
             <td>{{ $loan->type->name }}</td>
             <td>{{ $loan->payments->where('paid',1)->count() }}/{{ $loan->num_payments }}</td>
         </tr>
@@ -238,7 +238,7 @@
             <td>S/ {{ number_format($loan->amount, 2) }}</td>
             <td>S/ {{ number_format($loan->total_to_pay, 2) }}</td>
             <td>{{ $loan->created_at->format('d/m/Y') }}</td>
-            <td>{{ $loan->payments->where('paid',0)->first()->due_date }}</td>
+            <td>{{ optional($loan->payments->where('paid',0)->first())->fecha_vencimiento_formatted ?? '-' }}</td>
             <td>{{ $loan->type->name }}</td>
             <td>{{ $cuotasPagadas }}/{{ $loan->num_payments }}</td>
             <td>S/ {{ number_format($montoCuota, 2) }}</td>

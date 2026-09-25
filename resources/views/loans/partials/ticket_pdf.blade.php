@@ -63,9 +63,9 @@
 
 <div class="wrapper">
     <div style="text-align:center;">
-        <img src="{{ public_path('assets/images/credianro1.png') }}" 
+        <img src="{{ public_path('assets/images/credianro1.png') }}"
             style="width: 70px; vertical-align:middle; display:inline-block;">
-        <span style="font-size:16px; font-weight:bold; margin-left:8px; 
+        <span style="font-size:16px; font-weight:bold; margin-left:8px;
                     vertical-align:middle; display:inline-block;">
             CREDI-ANRO
         </span>
@@ -131,8 +131,24 @@
         </tr>
 
         <tr>
+            <td><strong>F. Vencimiento:</strong></td>
+            <td>{{ $payment->fecha_vencimiento_formatted }}</td>
+        </tr>
+
+        <tr>
             <td><strong>Fecha pago:</strong></td>
-            <td>{{ \Carbon\Carbon::parse($payment->updated_at)->format('d/m/Y') }}</td>
+            <td>{{ \Carbon\Carbon::parse($payment->updated_at)->format('d/m/Y H:i') }}</td>
+        </tr>
+
+        <tr>
+            <td><strong>Condición:</strong></td>
+            <td>
+                @if($payment->dias_atraso > 0)
+                    Atraso ({{ $payment->dias_atraso }} {{ $payment->dias_atraso == 1 ? 'día' : 'días' }})
+                @else
+                    Pago Puntual
+                @endif
+            </td>
         </tr>
     </table>
 

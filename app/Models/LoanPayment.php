@@ -32,4 +32,39 @@ class LoanPayment extends Model
     {
         return $this->belongsTo(Loan::class);
     }
+
+    public function isPaid()
+    {
+        return $this->status === 'paid' || ($this->status !== 'cancelled' && $this->paid == 1);
+    }
+
+    public function getDiasAtrasoAttribute()
+    {
+        $dueDate = \Carbon\Carbon::parse($this->due_date)->startOfDay();
+
+        if ($this->isPaid()) {
+            $paidDate = $this->updated_at ? \Carbon\Carbon::parse($this->updated_at)->startOfDay() : \Carbon\Carbon::today();
+            return $paidDate->greaterThan($dueDate) ? (int)$dueDate->diffInDays($paidDate) : 0;
+        }
+
+        if ($this->status === 'cancelled') {
+            return 0;
+        }
+
+        $today = \Carbon\Carbon::today();
+        return $today->greaterThan($dueDate) ? (int)$dueDate->diffInDays($today) : 0;
+    }
+
+    public function getFechaPagoFormattedAttribute()
+    {
+        if ($this->isPaid() && $this->updated_at) {
+            return \Carbon\Carbon::parse($this->updated_at)->format('d/m/Y');
+        }
+        return '-';
+    }
+
+    public function getFechaVencimientoFormattedAttribute()
+    {
+        return $this->due_date ? \Carbon\Carbon::parse($this->due_date)->format('d/m/Y') : '-';
+    }
 }

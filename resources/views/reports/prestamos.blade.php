@@ -57,7 +57,17 @@
             <td>S/ {{ number_format($pagado, 2) }}</td>
             <td>S/ {{ number_format($saldo, 2) }}</td>
             <td>{{ $loan->created_at->format('d/m/Y') }}</td>
-            <td>{{ $saldo <= 0 ? 'PAGADO' : 'PENDIENTE' }}</td>
+            <td>
+                @if($loan->estado_detalle == 'pagado')
+                    <span style="color: #28a745; font-weight: bold;">PAGADO</span>
+                @elseif($loan->estado_detalle == 'liquidado')
+                    <span style="color: #ffc107; font-weight: bold;">LIQUIDADO</span>
+                @elseif($loan->estado_detalle == 'atrasado')
+                    <span style="color: #dc3545; font-weight: bold;">CON ATRASO ({{ $loan->getMaxOverdueDays() }}d)</span>
+                @else
+                    <span style="color: #17a2b8; font-weight: bold;">AL DÍA</span>
+                @endif
+            </td>
         </tr>
         @endforeach
     </tbody>

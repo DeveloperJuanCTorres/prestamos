@@ -15,13 +15,15 @@
             <div><strong>Monto:</strong> S/. {{ number_format($loan->amount, 2) }}</div>
             <div><strong>Interés:</strong> {{ $loan->interest_percent }} %</div>
             <div><strong>Total:</strong> S/. {{ number_format($loan->total_to_pay, 2) }}</div>
-            <div><strong>Estado:</strong> 
-                @if ($loan->estado == 'pagado')
+            <div><strong>Estado:</strong>
+                @if ($loan->estado_detalle == 'pagado')
                     <span class="badge badge-success">PAGADO</span>
-                @elseif ($loan->estado == 'liquidado')
+                @elseif ($loan->estado_detalle == 'liquidado')
                     <span class="badge badge-warning" style="background-color: #ffc107; color: #212529;">LIQUIDADO</span>
+                @elseif ($loan->estado_detalle == 'atrasado')
+                    <span class="badge badge-danger">CON ATRASO ({{ $loan->getMaxOverdueDays() }}d)</span>
                 @else
-                    <span class="badge badge-danger">PENDIENTE</span>
+                    <span class="badge badge-info" style="background-color: #17a2b8; color: white;">AL DÍA</span>
                 @endif
             </div>
         </div>

@@ -10,8 +10,22 @@
 
                 <div class="d-flex justify-content-between mb-2">
                     <strong>Vencimiento:</strong>
-                    <span>{{ $p->due_date }}</span>
+                    <span>{{ $p->fecha_vencimiento_formatted }}</span>
                 </div>
+
+                @if($p->isPaid())
+                <div class="d-flex justify-content-between mb-2">
+                    <strong>F. Pago:</strong>
+                    <span>{{ $p->fecha_pago_formatted }}</span>
+                </div>
+                @endif
+
+                @if($p->dias_atraso > 0)
+                <div class="d-flex justify-content-between mb-2">
+                    <strong>Atraso:</strong>
+                    <span class="badge badge-danger" style="background-color: #dc3545; color: white;">{{ $p->dias_atraso }} días</span>
+                </div>
+                @endif
 
                 <div class="d-flex justify-content-between mb-2">
                     <strong>Monto:</strong>

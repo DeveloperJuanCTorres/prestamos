@@ -78,47 +78,83 @@ class BluetoothPrinter {
         const ESC = 0x1B;
         const LF = 0x0A;
 
+        // Reset
         commands.push(ESC, 0x40);
-        commands.push(ESC, 0x61, 0x01);
 
-        commands.push(LF);
+        // Header (Centrado y Negrita)
+        commands.push(ESC, 0x61, 0x01);
         commands.push(ESC, 0x45, 0x01);
         commands.push(...this.stringToBytes('CREDI-ANRO'));
         commands.push(LF);
         commands.push(...this.stringToBytes('TICKET DE PAGO'));
         commands.push(ESC, 0x45, 0x00);
-        commands.push(LF, LF);
+        commands.push(LF);
 
-        commands.push(...this.stringToBytes('================================'));
-        commands.push(LF, LF);
+        // Línea divisoria
+        commands.push(...this.stringToBytes('--------------------------------'));
+        commands.push(LF);
 
+        // Cliente (Izquierda)
         commands.push(ESC, 0x61, 0x00);
-        commands.push(...this.stringToBytes('CLIENTE: ' + ticketData.cliente));
+        commands.push(...this.stringToBytes('Cliente: ' + ticketData.cliente));
         commands.push(LF);
         commands.push(...this.stringToBytes('Doc: ' + ticketData.documento));
-        commands.push(LF, LF);
+        commands.push(LF);
 
+        // Línea divisoria
+        commands.push(...this.stringToBytes('--------------------------------'));
+        commands.push(LF);
+
+        // Detalle Préstamo
         commands.push(...this.stringToBytes('Prestamo: #' + ticketData.prestamo_id));
         commands.push(LF);
+        if (ticketData.monto_prestamo) {
+            commands.push(...this.stringToBytes('Monto Total: S/ ' + ticketData.monto_prestamo));
+            commands.push(LF);
+        }
+        if (ticketData.total_a_pagar) {
+            commands.push(...this.stringToBytes('A Pagar: S/ ' + ticketData.total_a_pagar));
+            commands.push(LF);
+        }
+        if (ticketData.tipo) {
+            commands.push(...this.stringToBytes('Tipo: ' + ticketData.tipo));
+            commands.push(LF);
+        }
         commands.push(...this.stringToBytes('Cuota: ' + ticketData.cuota + '/' + ticketData.total_cuotas));
         commands.push(LF);
-        commands.push(...this.stringToBytes('Fecha: ' + ticketData.fecha));
-        commands.push(LF, LF);
+        commands.push(...this.stringToBytes('Monto Pagado: S/ ' + ticketData.monto));
+        commands.push(LF);
+        commands.push(...this.stringToBytes('Saldo Restante: S/ ' + ticketData.saldo));
+        commands.push(LF);
+        if (ticketData.fecha_vencimiento) {
+            commands.push(...this.stringToBytes('F. Vencimiento: ' + ticketData.fecha_vencimiento));
+            commands.push(LF);
+        }
+        commands.push(...this.stringToBytes('F. Pago: ' + ticketData.fecha));
+        commands.push(LF);
 
+        const condicionStr = (ticketData.dias_atraso && ticketData.dias_atraso > 0)
+            ? ('Atraso (' + ticketData.dias_atraso + (ticketData.dias_atraso == 1 ? ' dia)' : ' dias)'))
+            : 'Pago Puntual';
+        commands.push(...this.stringToBytes('Condicion: ' + condicionStr));
+        commands.push(LF);
+
+        // Línea divisoria
+        commands.push(...this.stringToBytes('--------------------------------'));
+        commands.push(LF);
+
+        // Footer (Centrado)
         commands.push(ESC, 0x61, 0x01);
-        commands.push(ESC, 0x45, 0x01);
-        commands.push(...this.stringToBytes('S/ ' + ticketData.monto));
-        commands.push(ESC, 0x45, 0x00);
-        commands.push(LF, LF);
+        commands.push(...this.stringToBytes('!Gracias por su pago!'));
+        commands.push(LF);
 
-        commands.push(ESC, 0x61, 0x00);
-        commands.push(...this.stringToBytes('Saldo: S/ ' + ticketData.saldo));
-        commands.push(LF, LF);
-
-        commands.push(ESC, 0x61, 0x01);
-        commands.push(...this.stringToBytes('Gracias por su pago'));
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' +
+                        now.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', hour12: false });
+        commands.push(...this.stringToBytes(dateStr));
         commands.push(LF, LF, LF);
 
+        // Cortar papel / avance
         commands.push(ESC, 0x64, 0x03);
 
         return new Uint8Array(commands);

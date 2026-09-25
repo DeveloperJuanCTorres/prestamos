@@ -368,7 +368,7 @@ class LoanController extends Controller
             $basePayment = ceil(($totalToPay * 100 / $numPayments) / 10) / 10;
 
             $payments    = [];
-            
+
             // Determinar la fecha de inicio para cuotas nuevas (si las hay)
             if (!empty($originalDates)) {
                 $lastOriginalDateStr = end($originalDates);
@@ -481,7 +481,7 @@ class LoanController extends Controller
         $loan = Loan::findOrFail($payment->loan_id);
 
         $pdf = Pdf::loadView('loans.partials.ticket_pdf', compact('payment','loan'))
-                ->setPaper([0, 0, 203, 335]); // Formato ticket 80mm
+                ->setPaper([0, 0, 203, 550]); // Formato ticket 80mm (alto expandido para 1 sola página)
 
         return $pdf->stream('ticket_pago_'.$payment->id.'.pdf');
     }
@@ -526,11 +526,16 @@ class LoanController extends Controller
             'cliente' => $payment->loan->client->name,
             'documento' => $payment->loan->client->numero_doc,
             'prestamo_id' => $payment->loan_id,
+            'monto_prestamo' => number_format($payment->loan->amount, 2),
+            'total_a_pagar' => number_format($payment->loan->total_to_pay, 2),
+            'tipo' => $payment->loan->type->name,
             'cuota' => $payment->cuota,
             'total_cuotas' => $payment->loan->type->num_payments,
             'monto' => number_format($payment->amount, 2),
-            'saldo' => number_format($saldoPendiente, 2),
+            'saldo' => number_format(max(0, $saldoPendiente), 2),
+            'fecha_vencimiento' => $payment->fecha_vencimiento_formatted,
             'fecha' => $payment->updated_at->format('d/m/Y H:i'),
+            'dias_atraso' => $payment->dias_atraso,
             'payment_id' => $payment->id
         ];
 
@@ -787,7 +792,7 @@ class LoanController extends Controller
 
             // 2️⃣ Cancelar cuotas pendientes (status => cancelled)
             $quotesToCancelCount = $loan->getPendingPaymentsCount();
-            
+
             $loan->payments()
                 ->where('status', 'pending')
                 ->update(['status' => 'cancelled']);

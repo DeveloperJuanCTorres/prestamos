@@ -1,285 +1,350 @@
 @extends('layouts.app')
 
 @section('content')
-
-<div id="wrapper" style="min-height: 100vh;">
-
-    @include('partials.sidebar')
-    @include('partials.topbar')
-
-    <div class="clearfix"></div>
-
-    <div class="content-wrapper">
-        <div class="container-fluid">
-            <div class="row mt-3">
-                <div class="col-lg-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h5 class="card-title m-0">Listado de Préstamos</h5>
-                                <a href="/loans/create" class="btn btn-success"><i class="fa fa-plus px-2"></i>Nuevo</a>
-                            </div>
-
-                            <div class="d-flex flex-wrap gap-2 mb-3">
-                                <input type="text" id="search" class="form-control" style="flex: 1; min-width: 200px;" placeholder="Buscar por nombre o ID...">
-
-                                <select id="status" class="form-control" style="flex: 0.8; min-width: 150px;">
-                                    <option value="all">Todos los estados</option>
-                                    <option value="paid">Pagados</option>
-                                    <option value="pending">Con cuotas pendientes</option>
-                                </select>
-
-                                <select id="sort" class="form-control" style="flex: 0.8; min-width: 150px;">
-                                    <option value="id">Ordenar por: ID</option>
-                                    <option value="created_at">Ordenar por: Fecha</option>
-                                </select>
-
-                                <select id="order" class="form-control" style="flex: 0.8; min-width: 150px;">
-                                    <option value="desc" selected>Descendente</option>
-                                    <option value="asc">Ascendente</option>
-                                </select>
-
-                                <select id="perPage" class="form-control" style="flex: 0.8; min-width: 120px;">
-                                    <option value="5">5 por página</option>
-                                    <option value="10" selected>10 por página</option>
-                                    <option value="25">25 por página</option>
-                                    <option value="50">50 por página</option>
-                                </select>
-                            </div>
-
-                            <div class="table-responsive d-none d-md-block" id="types-container">
-                                <table class="table table-striped table-bordered w-100" style="width: 100% !important;">
-                                    <thead>
-                                        <tr>
-                                            <th style="width: 7%;">ID</th>
-                                            <th style="width: 20%;">Cliente.</th>
-                                            <th style="width: 13%;">Teléfono</th>
-                                            <th style="width: 10%;">Monto</th>
-                                            <th style="width: 8%;">%</th>
-                                            <th style="width: 10%;"># Cuotas</th>
-                                            <th style="width: 10%;">T. a pagar</th>
-                                            <th style="width: 12%;">Estado</th>
-                                            <th style="width: 10%;">Accion</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @include('loans.partials.list_table')
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <!-- CARDS MÓVIL -->
-                            <div class="d-block d-md-none" id="loans-cards-container">
-                                @include('loans.partials.list_cards')
-                            </div>
-
-                            <!-- Contenedor de paginación -->
-                            <div class="d-flex justify-content-center mt-2" id="pagination-container">
-                                <div class="pagination-sm">
-                                    {{ $loans->links('pagination::bootstrap-4') }}
+    <div id="wrapper" style="min-height: 100vh;">
+        @include('partials.sidebar')
+        @include('partials.topbar')
+        <div class="clearfix"></div>
+        <div class="content-wrapper">
+            <div class="container-fluid">
+                <div class="row mt-3">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="card-title m-0">Listado de Préstamos</h5>
+                                    <a href="/loans/create" class="btn btn-success"><i class="fa fa-plus px-2"></i>Nuevo</a>
                                 </div>
-                            </div>
+                                <div class="d-flex flex-wrap gap-2 mb-3">
+                                    <input type="text" id="search" class="form-control"
+                                        style="flex: 1; min-width: 200px;" placeholder="Buscar por nombre o ID...">
 
+                                    <select id="status" class="form-control" style="flex: 0.8; min-width: 150px;">
+                                        <option value="all">Todos los estados</option>
+                                        <option value="paid">Pagados</option>
+                                        <option value="pending">Con cuotas pendientes</option>
+                                    </select>
+
+                                    <select id="sort" class="form-control" style="flex: 0.8; min-width: 150px;">
+                                        <option value="id">Ordenar por: ID</option>
+                                        <option value="created_at">Ordenar por: Fecha</option>
+                                    </select>
+
+                                    <select id="order" class="form-control" style="flex: 0.8; min-width: 150px;">
+                                        <option value="desc" selected>Descendente</option>
+                                        <option value="asc">Ascendente</option>
+                                    </select>
+
+                                    <select id="perPage" class="form-control" style="flex: 0.8; min-width: 120px;">
+                                        <option value="5">5 por página</option>
+                                        <option value="10" selected>10 por página</option>
+                                        <option value="25">25 por página</option>
+                                        <option value="50">50 por página</option>
+                                    </select>
+                                </div>
+
+                                <div class="table-responsive d-none d-md-block" id="types-container">
+                                    <table class="table table-striped table-bordered w-100" style="width: 100% !important;">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 7%;">ID</th>
+                                                <th style="width: 20%;">Cliente.</th>
+                                                <th style="width: 13%;">Teléfono</th>
+                                                <th style="width: 10%;">Monto</th>
+                                                <th style="width: 8%;">%</th>
+                                                <th style="width: 10%;"># Cuotas</th>
+                                                <th style="width: 10%;">T. a pagar</th>
+                                                <th style="width: 12%;">Estado</th>
+                                                <th style="width: 10%;">Accion</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @include('loans.partials.list_table')
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- CARDS MÓVIL -->
+                                <div class="d-block d-md-none" id="loans-cards-container">
+                                    @include('loans.partials.list_cards')
+                                </div>
+
+                                <!-- Contenedor de paginación -->
+                                <div class="d-flex justify-content-center mt-2" id="pagination-container">
+                                    <div class="pagination-sm">
+                                        {{ $loans->links('pagination::bootstrap-4') }}
+                                    </div>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <a href="javaScript:void();" class="back-to-top"><i class="fa fa-angle-double-up"></i></a>
+
+
+        @include('partials.footer')
+
     </div>
 
-    <a href="javaScript:void();" class="back-to-top"><i class="fa fa-angle-double-up"></i></a>
+    <!-- JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+    <script>
+        // ===============================
+        // Función para cargar préstamos
+        // ===============================
+        function loadTypes(page = 1) {
+            let search = $("#search").val();
+            let perPage = $("#perPage").val();
+            let status = $("#status").val();
+            let sort = $("#sort").val();
+            let order = $("#order").val();
 
-    @include('partials.footer')
-
-</div>
-
-<!-- JS -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<script>
-    // ===============================
-    // Función para cargar préstamos
-    // ===============================
-    function loadTypes(page = 1) {
-        let search = $("#search").val();
-        let perPage = $("#perPage").val();
-        let status = $("#status").val();
-        let sort = $("#sort").val();
-        let order = $("#order").val();
-
-        $.ajax({
-            url: "{{ route('loans.list') }}",
-            type: "GET",
-            data: {
-                search: search,
-                perPage: perPage,
-                page: page,
-                status: status,
-                sort: sort,
-                order: order
-            },
-            dataType: "json",
-            success: function(data) {
-                // Actualizar tabla y paginación
-                $("#types-container tbody").html(data.table);
-                $("#loans-cards-container").html(data.cards);
-                $("#pagination-container").html(data.pagination);
-            }
-        });
-    }
-
-    // ===============================
-    // Buscar al escribir
-    // ===============================
-    $("#search").on("keyup", function() { loadTypes(); });
-
-    // ===============================
-    // Filtrar por estado
-    // ===============================
-    $("#status").on("change", function() { loadTypes(); });
-
-    // ===============================
-    // Cambiar ordenamiento
-    // ===============================
-    $("#sort").on("change", function() { loadTypes(); });
-
-    // ===============================
-    // Cambiar orden (asc/desc)
-    // ===============================
-    $("#order").on("change", function() { loadTypes(); });
-
-    // ===============================
-    // Cambiar cantidad de registros
-    // ===============================
-    $("#perPage").on("change", function() { loadTypes(); });
-
-    // ===============================
-    // Paginación
-    // ===============================
-    $(document).on("click", "#pagination-container a", function(e){
-        e.preventDefault();
-        let page = $(this).attr("href").split('page=')[1];
-        loadTypes(page);
-    });
-
-    // ===============================
-    // Crear cliente
-    // ===============================
-    $(document).on("click", "#btnCreate", function(){
-        $('#createType').modal('show');
-    });
-
-    $(document).on("click", ".registrar", function(e){
-        e.preventDefault();
-        let formData = new FormData($("#formAgregar")[0]);
-
-
-        $.ajax({
-            url: "{{ route('types.store') }}",
-            type: "POST",
-            data: formData,
-            contentType: false,
-            processData: false,
-            headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
-            success: function(response){
-                if(response.status){
-                    $("#createType").modal("hide");
-                    $("#formAgregar")[0].reset();
-                    loadTypes();
-                    Swal.fire({icon: "success", title: response.msg, toast:true, position:"top-end", timer:3000, showConfirmButton:false});
-                } else {
-                    Swal.fire({icon: "error", title: response.msg, toast:true, position:"top-end", timer:3000, showConfirmButton:false});
+            $.ajax({
+                url: "{{ route('loans.list') }}",
+                type: "GET",
+                data: {
+                    search: search,
+                    perPage: perPage,
+                    page: page,
+                    status: status,
+                    sort: sort,
+                    order: order
+                },
+                dataType: "json",
+                success: function(data) {
+                    // Actualizar tabla y paginación
+                    $("#types-container tbody").html(data.table);
+                    $("#loans-cards-container").html(data.cards);
+                    $("#pagination-container").html(data.pagination);
                 }
-            },
-            error: function(){ Swal.fire("Error", "Hubo un problema en el servidor", "error"); }
+            });
+        }
+
+        // ===============================
+        // Buscar al escribir
+        // ===============================
+        $("#search").on("keyup", function() {
+            loadTypes();
         });
-    });
 
-    // ===============================
-    // Editar cliente
-    // ===============================
-    $(document).on("click", ".type-edit", function(e){
-        e.preventDefault();
-        let id = $(this).data("id");
+        // ===============================
+        // Filtrar por estado
+        // ===============================
+        $("#status").on("change", function() {
+            loadTypes();
+        });
 
-        $.ajax({
-            url: "{{ route('types.edit') }}",
-            type: "POST",
-            data: {id: id, _token: "{{ csrf_token() }}"},
-            success: function(response){
-                if(response.status){
-                    let c = response.type;
-                    $('#edit_id').val(c.id);
-                    $('#edit_name').val(c.name);
-                    $('#edit_minimo').val(c.minimo);
-                    $('#edit_maximo').val(c.maximo);
-                    $('#edit_periodo').val(c.periodicity_days);
-                    $('#edit_num_payments').val(c.num_payments);
-                    $('#editType').modal('show');
-                } else {
-                    Swal.fire({icon: "error", title: response.msg, toast:true, position:"top-end", timer:3000, showConfirmButton:false});
+        // ===============================
+        // Cambiar ordenamiento
+        // ===============================
+        $("#sort").on("change", function() {
+            loadTypes();
+        });
+
+        // ===============================
+        // Cambiar orden (asc/desc)
+        // ===============================
+        $("#order").on("change", function() {
+            loadTypes();
+        });
+
+        // ===============================
+        // Cambiar cantidad de registros
+        // ===============================
+        $("#perPage").on("change", function() {
+            loadTypes();
+        });
+
+        // ===============================
+        // Paginación
+        // ===============================
+        $(document).on("click", "#pagination-container a", function(e) {
+            e.preventDefault();
+            let page = $(this).attr("href").split('page=')[1];
+            loadTypes(page);
+        });
+
+        // ===============================
+        // Crear cliente
+        // ===============================
+        $(document).on("click", "#btnCreate", function() {
+            $('#createType').modal('show');
+        });
+
+        $(document).on("click", ".registrar", function(e) {
+            e.preventDefault();
+            let formData = new FormData($("#formAgregar")[0]);
+
+
+            $.ajax({
+                url: "{{ route('types.store') }}",
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    if (response.status) {
+                        $("#createType").modal("hide");
+                        $("#formAgregar")[0].reset();
+                        loadTypes();
+                        Swal.fire({
+                            icon: "success",
+                            title: response.msg,
+                            toast: true,
+                            position: "top-end",
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: response.msg,
+                            toast: true,
+                            position: "top-end",
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
+                    }
+                },
+                error: function() {
+                    Swal.fire("Error", "Hubo un problema en el servidor", "error");
                 }
-            },
-            error: function(){ Swal.fire("Error", "Hubo un problema en el servidor", "error"); }
+            });
         });
-    });
 
-    $(document).on("submit", "#formEditType", function(e){
-        e.preventDefault();
-        let formData = new FormData(this);
+        // ===============================
+        // Editar cliente
+        // ===============================
+        $(document).on("click", ".type-edit", function(e) {
+            e.preventDefault();
+            let id = $(this).data("id");
 
-        $.ajax({
-            url: "{{ route('types.update') }}",
-            type: "POST",
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(response){
-                if(response.status){
-                    $('#editType').modal('hide');
-                    loadTypes();
-                    Swal.fire({icon: "success", title: response.msg, toast:true, position:"top-end", timer:3000, showConfirmButton:false});
-                } else { Swal.fire("Error", response.msg, "error"); }
-            },
-            error: function(){ Swal.fire("Error", "Hubo un problema en el servidor", "error"); }
+            $.ajax({
+                url: "{{ route('types.edit') }}",
+                type: "POST",
+                data: {
+                    id: id,
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function(response) {
+                    if (response.status) {
+                        let c = response.type;
+                        $('#edit_id').val(c.id);
+                        $('#edit_name').val(c.name);
+                        $('#edit_minimo').val(c.minimo);
+                        $('#edit_maximo').val(c.maximo);
+                        $('#edit_periodo').val(c.periodicity_days);
+                        $('#edit_num_payments').val(c.num_payments);
+                        $('#editType').modal('show');
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: response.msg,
+                            toast: true,
+                            position: "top-end",
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
+                    }
+                },
+                error: function() {
+                    Swal.fire("Error", "Hubo un problema en el servidor", "error");
+                }
+            });
         });
-    });
 
-    // ===============================
-    // Eliminar cliente
-    // ===============================
-    $(document).on("click", ".type-eliminar", function(e){
-        e.preventDefault();
-        let id = $(this).data("id");
-        let name = $(this).data("name");
+        $(document).on("submit", "#formEditType", function(e) {
+            e.preventDefault();
+            let formData = new FormData(this);
 
-        Swal.fire({
-            title: "Eliminar tipo",
-            text: "¿Estás seguro de eliminar a " + name + "?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Sí, eliminar",
-            cancelButtonText: "Cancelar"
-        }).then((result) => {
-            if(result.isConfirmed){
-                $.ajax({
-                    url: "{{ route('types.delet') }}",
-                    type: "POST",
-                    data: {id: id, _token: "{{ csrf_token() }}"},
-                    success: function(response){
-                        if(response.status){
-                            loadTypes();
-                            Swal.fire({icon:"success", title: response.msg, toast:true, position:"top-end", timer:3000, showConfirmButton:false});
-                        } else {
-                            Swal.fire({icon:"error", title: response.msg, toast:true, position:"top-end", timer:3000, showConfirmButton:false});
+            $.ajax({
+                url: "{{ route('types.update') }}",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status) {
+                        $('#editType').modal('hide');
+                        loadTypes();
+                        Swal.fire({
+                            icon: "success",
+                            title: response.msg,
+                            toast: true,
+                            position: "top-end",
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        Swal.fire("Error", response.msg, "error");
+                    }
+                },
+                error: function() {
+                    Swal.fire("Error", "Hubo un problema en el servidor", "error");
+                }
+            });
+        });
+
+        // ===============================
+        // Eliminar cliente
+        // ===============================
+        $(document).on("click", ".type-eliminar", function(e) {
+            e.preventDefault();
+            let id = $(this).data("id");
+            let name = $(this).data("name");
+
+            Swal.fire({
+                title: "Eliminar tipo",
+                text: "¿Estás seguro de eliminar a " + name + "?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sí, eliminar",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{ route('types.delet') }}",
+                        type: "POST",
+                        data: {
+                            id: id,
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(response) {
+                            if (response.status) {
+                                loadTypes();
+                                Swal.fire({
+                                    icon: "success",
+                                    title: response.msg,
+                                    toast: true,
+                                    position: "top-end",
+                                    timer: 3000,
+                                    showConfirmButton: false
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: response.msg,
+                                    toast: true,
+                                    position: "top-end",
+                                    timer: 3000,
+                                    showConfirmButton: false
+                                });
+                            }
+                        },
+                        error: function() {
+                            Swal.fire("Error", "Hubo un problema en el servidor", "error");
                         }
-                    },
-                    error: function(){ Swal.fire("Error", "Hubo un problema en el servidor", "error"); }
-                });
-            }
+                    });
+                }
+            });
         });
-    });
-</script>
-
+    </script>
 @endsection

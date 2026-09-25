@@ -4,18 +4,28 @@
             <tr>
                 <th># Cuota</th>
                 <th>Fecha vencimiento</th>
+                <th>Fecha pago</th>
                 <th>Monto</th>
-                <th>Pagado</th>
+                <th>Atraso</th>
+                <th>Estado / Acciones</th>
             </tr>
         </thead>
         <tbody>
             @foreach($loan->payments as $i => $p)
                 <tr>
                     <td>{{ $p->cuota }}</td>
-                    <td>{{ $p->due_date }}</td>
+                    <td>{{ $p->fecha_vencimiento_formatted }}</td>
+                    <td>{{ $p->fecha_pago_formatted }}</td>
                     <td>S/. {{ number_format($p->amount,2) }}</td>
                     <td>
-                        @if($p->status === 'paid' || ($p->status !== 'cancelled' && $p->paid == 1))
+                        @if($p->dias_atraso > 0)
+                            <span class="badge badge-danger" style="background-color: #dc3545; color: white;">{{ $p->dias_atraso }} días</span>
+                        @else
+                            <span class="badge badge-success" style="background-color: #28a745; color: white;">0 d.</span>
+                        @endif
+                    </td>
+                    <td>
+                        @if($p->isPaid())
                             <!-- <span class="badge bg-success">PAGADO</span> -->
 
                             <button class="btn btn-dark btn-sm btn-print-ticket" data-id="{{ $p->id }}">

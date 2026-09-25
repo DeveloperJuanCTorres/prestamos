@@ -53,6 +53,51 @@ class Loan extends Model
         return $this->getPendingPaymentsCount() === 0 ? 'pagado' : 'pendiente';
     }
 
+    public function hasOverduePayments()
+    {
+        if ($this->isLiquidated() || $this->getPendingPaymentsCount() === 0) {
+            return false;
+        }
+        $today = \Carbon\Carbon::today()->toDateString();
+        return $this->payments
+            ->where('paid', 0)
+            ->where('status', '!=', 'cancelled')
+            ->where('due_date', '<', $today)
+            ->count() > 0;
+    }
+
+    public function getMaxOverdueDays()
+    {
+        if (!$this->hasOverduePayments()) {
+            return 0;
+        }
+        $today = \Carbon\Carbon::today();
+        $overduePayment = $this->payments
+            ->where('paid', 0)
+            ->where('status', '!=', 'cancelled')
+            ->where('due_date', '<', $today->toDateString())
+            ->sortBy('due_date')
+            ->first();
+
+        if (!$overduePayment) return 0;
+        $dueDate = \Carbon\Carbon::parse($overduePayment->due_date)->startOfDay();
+        return (int)$dueDate->diffInDays($today);
+    }
+
+    public function getEstadoDetalleAttribute()
+    {
+        if ($this->isLiquidated()) {
+            return 'liquidado';
+        }
+        if ($this->getPendingPaymentsCount() === 0) {
+            return 'pagado';
+        }
+        if ($this->hasOverduePayments()) {
+            return 'atrasado';
+        }
+        return 'al_dia';
+    }
+
     public function hasAnyPaidPayment()
     {
         return $this->getPaidPaymentsCount() > 0;
